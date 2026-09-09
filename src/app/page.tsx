@@ -6,6 +6,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WhatsAppFloatingBtn from '@/components/WhatsAppFloatingBtn';
 import PlotInventoryViewer from '@/components/PlotInventoryViewer';
+import HomeVideoGallery from '@/components/HomeVideoGallery';
+import PricingSection from '@/components/PricingSection';
 import {
   ArrowRight,
   Shield,
@@ -24,7 +26,10 @@ import {
   Anchor,
   Droplets,
   Sun,
-  Truck
+  Truck,
+  BookOpen,
+  Clock,
+  Film
 } from 'lucide-react';
 
 export const revalidate = 60; // ISR every 60 seconds
@@ -40,6 +45,25 @@ export default async function HomePage() {
     where: { projectId: project?.id || '' },
     orderBy: { plotNumber: 'asc' },
     take: 12,
+  });
+
+  // Fetch active videos for gallery
+  const videos = await prisma.video.findMany({
+    where: { isActive: true },
+    orderBy: [
+      { displayOrder: 'asc' },
+      { createdAt: 'desc' }
+    ]
+  });
+
+  // Fetch published blog posts for homepage showcase
+  const blogPosts = await prisma.blogPost.findMany({
+    where: { status: 'PUBLISHED' },
+    orderBy: [
+      { publishedAt: 'desc' },
+      { createdAt: 'desc' }
+    ],
+    take: 3
   });
 
   // Fetch FAQs & Testimonials
@@ -327,6 +351,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* OFFICIAL PROJECT PRICING & PAYMENT PLAN */}
+      <PricingSection id="pricing" />
+
       {/* 4 STRATEGIC GROWTH PILLARS OF DHOLERA */}
       <section className="section-padding" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-custom">
@@ -437,136 +464,517 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* VIDEO GALLERY SECTION */}
+      <HomeVideoGallery videos={videos} />
+
       {/* EXECUTIVE TEAM DIRECTORY */}
-      <section className="section-padding" style={{ backgroundColor: '#ffffff' }}>
+      <section className="section-padding" style={{ backgroundColor: '#ffffff', position: 'relative' }}>
         <div className="container-custom">
-          <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3.5rem' }}>
-            <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Leadership &amp; Advisory</span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem' }}>
+          <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 3.5rem' }}>
+            <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>
+              <Shield size={13} style={{ marginRight: '0.25rem' }} /> Leadership &amp; Advisory Board
+            </span>
+            <h2 style={{ fontSize: 'clamp(2.1rem, 3.8vw, 2.9rem)', color: 'var(--primary-dark)', marginBottom: '0.75rem', lineHeight: 1.2 }}>
               Connect Directly with Our Directors
             </h2>
-            <p style={{ color: '#64748b', fontSize: '1.05rem' }}>
-              At Om Swastik Buildhomes, we believe in direct transparency. Speak directly with our leadership team for investment consultation, plot allotment, or site visits.
+            <p style={{ color: '#5e6d70', fontSize: '1.05rem', lineHeight: 1.7 }}>
+              At Om Swastik Buildhomes, we uphold complete accountability. Speak directly with our founding directors for authentic plot allotment, legal title due diligence, and arranged Dholera SIR site visits.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.25rem', marginBottom: '2.5rem' }}>
             {/* Rahul Bisht */}
-            <div className="luxury-card" style={{ padding: '2rem', textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: '90px', height: '90px', margin: '0 auto 1.25rem', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--gold)' }}>
-                <Image src="/images/qr-rahul.png" alt="Rahul Bisht QR" fill style={{ objectFit: 'cover' }} />
-              </div>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-dark)', marginBottom: '0.2rem' }}>Rahul Bisht</h3>
-              <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '1rem' }}>
-                Director — Om Swastik Buildhomes
-              </div>
-              <p style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '1.25rem' }}>
-                Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <a href="tel:+919810484742" className="btn-teal" style={{ padding: '0.65rem', fontSize: '0.85rem' }}>
-                  <Phone size={14} /> Call
-                </a>
-                <a
-                  href="https://wa.me/919810484742?text=Hi%20Rahul%20Bisht%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera."
-                  target="_blank"
-                  rel="noopener noreferrer"
+            <div
+              className="luxury-card"
+              style={{
+                padding: '2.5rem 2rem',
+                textAlign: 'center',
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid rgba(228, 170, 60, 0.35)',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, var(--primary), var(--gold))' }} />
+
+              <div>
+                {/* Executive Portrait */}
+                <div
                   style={{
-                    backgroundColor: '#25D366',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
+                    position: 'relative',
+                    width: '150px',
+                    height: '150px',
+                    margin: '0 auto 1.5rem',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0 12px 28px rgba(0, 70, 74, 0.18), 0 0 0 4px #ffffff, 0 0 0 6px var(--gold)',
                   }}
                 >
-                  <MessageCircle size={15} /> WhatsApp
-                </a>
+                  <Image
+                    src="/images/directors/rahul-bisht.jpg"
+                    alt="Rahul Bisht — Director, Om Swastik Buildhomes"
+                    fill
+                    sizes="150px"
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                </div>
+
+                <h3 style={{ fontSize: '1.75rem', color: 'var(--primary-dark)', marginBottom: '0.35rem', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>
+                  Rahul Bisht
+                </h3>
+
+                <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '1.25rem', letterSpacing: '0.01em' }}>
+                  Director — Om Swastik Buildhomes
+                </div>
+
+                <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+                  Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <a
+                    href="tel:+919810484742"
+                    className="btn-teal"
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      fontSize: '0.875rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      borderRadius: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Phone size={15} /> Call Direct
+                  </a>
+                  <a
+                    href="https://wa.me/919810484742?text=Hi%20Rahul%20Bisht%20Ji%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera%20SIR.%20Please%20guide%20me."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      backgroundColor: '#25D366',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      padding: '0.75rem 0.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 6px rgba(37, 211, 102, 0.3)',
+                    }}
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                </div>
+
+                <div style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem' }}>
+                  <Phone size={12} style={{ color: 'var(--primary)' }} />
+                  <span style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>+91 98104 84742</span>
+                </div>
               </div>
             </div>
 
             {/* Praful Singh */}
-            <div className="luxury-card" style={{ padding: '2rem', textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: '90px', height: '90px', margin: '0 auto 1.25rem', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--gold)' }}>
-                <Image src="/images/qr-prafull.png" alt="Praful Singh QR" fill style={{ objectFit: 'cover' }} />
-              </div>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-dark)', marginBottom: '0.2rem' }}>Praful Singh</h3>
-              <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '1rem' }}>
-                Director — Om Swastik Buildhomes
-              </div>
-              <p style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '1.25rem' }}>
-                Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <a href="tel:+919599213531" className="btn-teal" style={{ padding: '0.65rem', fontSize: '0.85rem' }}>
-                  <Phone size={14} /> Call
-                </a>
-                <a
-                  href="https://wa.me/919599213531?text=Hi%20Praful%20Singh%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera."
-                  target="_blank"
-                  rel="noopener noreferrer"
+            <div
+              className="luxury-card"
+              style={{
+                padding: '2.5rem 2rem',
+                textAlign: 'center',
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid rgba(228, 170, 60, 0.35)',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, var(--gold), var(--primary))' }} />
+
+              <div>
+                {/* Executive Portrait */}
+                <div
                   style={{
-                    backgroundColor: '#25D366',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
+                    position: 'relative',
+                    width: '150px',
+                    height: '150px',
+                    margin: '0 auto 1.5rem',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0 12px 28px rgba(0, 70, 74, 0.18), 0 0 0 4px #ffffff, 0 0 0 6px var(--gold)',
                   }}
                 >
-                  <MessageCircle size={15} /> WhatsApp
-                </a>
+                  <Image
+                    src="/images/directors/praful-singh.jpg"
+                    alt="Praful Singh — Director, Om Swastik Buildhomes"
+                    fill
+                    sizes="150px"
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                </div>
+
+                <h3 style={{ fontSize: '1.75rem', color: 'var(--primary-dark)', marginBottom: '0.35rem', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>
+                  Praful Singh
+                </h3>
+
+                <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '1.25rem', letterSpacing: '0.01em' }}>
+                  Director — Om Swastik Buildhomes
+                </div>
+
+                <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+                  Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <a
+                    href="tel:+919599213531"
+                    className="btn-teal"
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      fontSize: '0.875rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      borderRadius: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Phone size={15} /> Call Direct
+                  </a>
+                  <a
+                    href="https://wa.me/919599213531?text=Hi%20Praful%20Singh%20Ji%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera%20SIR.%20Please%20guide%20me."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      backgroundColor: '#25D366',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      padding: '0.75rem 0.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 6px rgba(37, 211, 102, 0.3)',
+                    }}
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                </div>
+
+                <div style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem' }}>
+                  <Phone size={12} style={{ color: 'var(--primary)' }} />
+                  <span style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>+91 95992 13531</span>
+                </div>
               </div>
             </div>
 
             {/* Santosh Gupta */}
-            <div className="luxury-card" style={{ padding: '2rem', textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: '90px', height: '90px', margin: '0 auto 1.25rem', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--gold)' }}>
-                <Image src="/images/qr-santosh.png" alt="Santosh Gupta QR" fill style={{ objectFit: 'cover' }} />
-              </div>
-              <h3 style={{ fontSize: '1.4rem', color: 'var(--primary-dark)', marginBottom: '0.2rem' }}>Santosh Gupta</h3>
-              <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.85rem', marginBottom: '1rem' }}>
-                Director — Om Swastik Buildhomes
-              </div>
-              <p style={{ fontSize: '0.825rem', color: '#64748b', marginBottom: '1.25rem' }}>
-                Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                <a href="tel:+919990842233" className="btn-teal" style={{ padding: '0.65rem', fontSize: '0.85rem' }}>
-                  <Phone size={14} /> Call
-                </a>
-                <a
-                  href="https://wa.me/919990842233?text=Hi%20Santosh%20Gupta%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera."
-                  target="_blank"
-                  rel="noopener noreferrer"
+            <div
+              className="luxury-card"
+              style={{
+                padding: '2.5rem 2rem',
+                textAlign: 'center',
+                backgroundColor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid rgba(228, 170, 60, 0.35)',
+                boxShadow: 'var(--shadow-md)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, var(--primary), var(--gold))' }} />
+
+              <div>
+                {/* Executive Portrait */}
+                <div
                   style={{
-                    backgroundColor: '#25D366',
-                    color: '#fff',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontSize: '0.85rem',
-                    fontWeight: 600,
+                    position: 'relative',
+                    width: '150px',
+                    height: '150px',
+                    margin: '0 auto 1.5rem',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    boxShadow: '0 12px 28px rgba(0, 70, 74, 0.18), 0 0 0 4px #ffffff, 0 0 0 6px var(--gold)',
                   }}
                 >
-                  <MessageCircle size={15} /> WhatsApp
-                </a>
+                  <Image
+                    src="/images/directors/santosh-gupta.jpg"
+                    alt="Santosh Gupta — Director, Om Swastik Buildhomes"
+                    fill
+                    sizes="150px"
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                </div>
+
+                <h3 style={{ fontSize: '1.75rem', color: 'var(--primary-dark)', marginBottom: '0.35rem', fontFamily: 'var(--font-heading)', fontWeight: 700 }}>
+                  Santosh Gupta
+                </h3>
+
+                <div style={{ color: 'var(--gold-deep)', fontWeight: 600, fontSize: '0.95rem', marginBottom: '1.25rem', letterSpacing: '0.01em' }}>
+                  Director — Om Swastik Buildhomes
+                </div>
+
+                <p style={{ fontSize: '0.85rem', color: '#64748b', lineHeight: 1.5, marginBottom: '1.5rem' }}>
+                  Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P.
+                </p>
               </div>
+
+              {/* Action Buttons */}
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <a
+                    href="tel:+919990842233"
+                    className="btn-teal"
+                    style={{
+                      padding: '0.75rem 0.5rem',
+                      fontSize: '0.875rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      borderRadius: '10px',
+                      fontWeight: 600,
+                    }}
+                  >
+                    <Phone size={15} /> Call Direct
+                  </a>
+                  <a
+                    href="https://wa.me/919990842233?text=Hi%20Santosh%20Gupta%20Ji%2C%20I%20am%20interested%20in%20Riddhi%20Premium%20Plots%20in%20Dholera%20SIR.%20Please%20guide%20me."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      backgroundColor: '#25D366',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      padding: '0.75rem 0.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 6px rgba(37, 211, 102, 0.3)',
+                    }}
+                  >
+                    <MessageCircle size={16} /> WhatsApp
+                  </a>
+                </div>
+
+                <div style={{ fontSize: '0.85rem', color: '#94a3b8', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem' }}>
+                  <Phone size={12} style={{ color: 'var(--primary)' }} />
+                  <span style={{ fontWeight: 600, color: 'var(--primary-dark)' }}>+91 99908 42233</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Direct Leadership Trust Bar */}
+          <div
+            style={{
+              backgroundColor: '#f8fafc',
+              borderRadius: '16px',
+              padding: '1.25rem 2rem',
+              border: '1px solid #e2e8f0',
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <CheckCircle2 size={18} style={{ color: '#10b981' }} />
+              <span style={{ fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
+                100% Clear-Title Due Diligence
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <CheckCircle2 size={18} style={{ color: '#10b981' }} />
+              <span style={{ fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
+                Direct Registered Remittances (Zero Middlemen)
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <CheckCircle2 size={18} style={{ color: '#10b981' }} />
+              <span style={{ fontSize: '0.9rem', color: '#334155', fontWeight: 600 }}>
+                Personal VIP Dholera SIR Site Inspections
+              </span>
             </div>
           </div>
         </div>
       </section>
 
+      {/* BLOG / MARKET INTELLIGENCE PREVIEW */}
+      {blogPosts.length > 0 && (
+        <section className="section-padding" style={{ backgroundColor: 'var(--ivory)', borderTop: '1px solid var(--grey-border)' }}>
+          <div className="container-custom">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '3.5rem', flexWrap: 'wrap', gap: '1.5rem' }}>
+              <div style={{ maxWidth: '650px' }}>
+                <span className="gold-badge" style={{ marginBottom: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <BookOpen size={13} /> Market Intelligence &amp; Research
+                </span>
+                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', margin: 0, color: 'var(--primary-dark)' }}>
+                  Authoritative Dholera SIR Insights &amp; Guides
+                </h2>
+                <p style={{ color: '#64748b', fontSize: '1.05rem', marginTop: '0.75rem', lineHeight: 1.6 }}>
+                  Read comprehensive reports on semiconductor ecosystem progress, expressway connectivity, and legal diligence checklists.
+                </p>
+              </div>
+
+              <Link
+                href="/blog"
+                className="btn-outline"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}
+              >
+                <span>View All Articles</span>
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                gap: '2rem',
+              }}
+            >
+              {blogPosts.map((post) => (
+                <article
+                  key={post.id}
+                  className="luxury-card"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    border: '1px solid var(--grey-border)',
+                    backgroundColor: '#ffffff',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    style={{
+                      position: 'relative',
+                      width: '100%',
+                      height: '210px',
+                      backgroundColor: '#002528',
+                      overflow: 'hidden',
+                      display: 'block',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={post.featuredImage || '/images/hero-dholera.jpg'}
+                      alt={post.title}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.4s ease',
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: '12px',
+                        left: '12px',
+                        backgroundColor: 'rgba(0, 37, 40, 0.9)',
+                        color: 'var(--gold)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        padding: '0.25rem 0.65rem',
+                        borderRadius: '4px',
+                        backdropFilter: 'blur(4px)',
+                      }}
+                    >
+                      {post.category}
+                    </span>
+                  </Link>
+
+                  <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                      {post.publishedAt && (
+                        <span>{new Date(post.publishedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                      )}
+                      {post.readTime && <span>• {post.readTime}</span>}
+                    </div>
+
+                    <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--primary-dark)', lineHeight: 1.35, marginBottom: '0.6rem' }}>
+                      <Link href={`/blog/${post.slug}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {post.title}
+                      </Link>
+                    </h3>
+
+                    <p
+                      style={{
+                        fontSize: '0.875rem',
+                        color: '#64748b',
+                        lineHeight: 1.6,
+                        margin: '0 0 1.25rem 0',
+                        flex: 1,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {post.excerpt}
+                    </p>
+
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      style={{
+                        color: 'var(--primary)',
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        marginTop: 'auto',
+                      }}
+                    >
+                      <span>Read Full Report</span>
+                      <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* FAQS */}
-      <section className="section-padding" style={{ backgroundColor: 'var(--ivory)' }}>
+      <section className="section-padding" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-custom" style={{ maxWidth: '850px' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Clear Answers</span>

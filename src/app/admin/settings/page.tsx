@@ -15,17 +15,20 @@ export default function AdminSettingsPage() {
     primaryEmail: 'rahulbisht@omswastikbuildhomes.com',
     whatsappNumber: '919599213531',
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.setting) setSettings(data.setting);
+      .then((res) => {
+        if (res.ok) return res.json();
+        return null;
       })
-      .finally(() => setLoading(false));
+      .then((data: any) => {
+        if (data && data.setting) setSettings(data.setting);
+      })
+      .catch(() => {});
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -50,10 +53,6 @@ export default function AdminSettingsPage() {
     }
   };
 
-  if (loading) {
-    return <div style={{ padding: '3rem', textAlign: 'center' }}>Loading corporate settings...</div>;
-  }
-
   return (
     <div style={{ maxWidth: '850px' }}>
       <div style={{ marginBottom: '2rem' }}>
@@ -63,98 +62,145 @@ export default function AdminSettingsPage() {
         </p>
       </div>
 
-      {success && (
-        <div style={{ padding: '0.85rem 1rem', background: '#dcfce7', border: '1px solid #bbf7d0', borderRadius: '8px', color: '#166534', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <CheckCircle2 size={18} />
-          <span>Settings saved successfully. Public website and headers have been updated.</span>
-        </div>
-      )}
+      <div
+        id="settings-success-alert"
+        style={{
+          display: success ? 'flex' : 'none',
+          padding: '0.85rem 1rem',
+          background: '#dcfce7',
+          border: '1px solid #bbf7d0',
+          borderRadius: '8px',
+          color: '#166534',
+          marginBottom: '1.5rem',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <CheckCircle2 size={18} />
+        <span>Settings saved successfully. Public website and headers have been updated.</span>
+      </div>
 
       <div className="luxury-card" style={{ padding: '2rem' }}>
-        <form onSubmit={handleSave}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+        <form id="corporate-settings-form" onSubmit={handleSave}>
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Shield size={18} style={{ color: 'var(--gold)' }} />
+            Corporate Identity &amp; Legal Credentials
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
             <div className="form-group">
-              <label className="form-label">Legal Company Name</label>
+              <label className="form-label">Registered Legal Entity Name</label>
               <input
+                id="setting-companyName"
+                name="companyName"
                 type="text"
-                required
                 className="form-input"
-                value={settings.companyName}
+                value={settings.companyName || ''}
                 onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">MCA Registration CIN</label>
+              <label className="form-label">Corporate Identification Number (CIN)</label>
               <input
+                id="setting-cin"
+                name="cin"
                 type="text"
-                required
                 className="form-input"
-                value={settings.cin}
+                value={settings.cin || ''}
                 onChange={(e) => setSettings({ ...settings, cin: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Company Tagline / Vision</label>
+              <input
+                id="setting-tagline"
+                name="tagline"
+                type="text"
+                className="form-input"
+                value={settings.tagline || ''}
+                onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">WhatsApp Helpline Routing (Format: 919599213531)</label>
+              <input
+                id="setting-whatsappNumber"
+                name="whatsappNumber"
+                type="text"
+                className="form-input"
+                value={settings.whatsappNumber || ''}
+                onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Company Tagline</label>
-            <input
-              type="text"
-              className="form-input"
-              value={settings.tagline}
-              onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Registered Headquarters Address</label>
+          <div className="form-group" style={{ marginTop: '0.5rem' }}>
+            <label className="form-label">Head Office Address</label>
             <textarea
+              id="setting-officeAddress"
+              name="officeAddress"
               rows={2}
               className="form-textarea"
-              value={settings.officeAddress}
+              value={settings.officeAddress || ''}
               onChange={(e) => setSettings({ ...settings, officeAddress: e.target.value })}
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '2rem 0' }} />
+
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-dark)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Phone size={18} style={{ color: 'var(--primary)' }} />
+            Director &amp; Sales Helplines
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem' }}>
             <div className="form-group">
-              <label className="form-label">Primary Phone (Praful Singh)</label>
+              <label className="form-label">Primary Executive Line</label>
               <input
+                id="setting-primaryPhone"
+                name="primaryPhone"
                 type="text"
                 className="form-input"
-                value={settings.primaryPhone}
+                value={settings.primaryPhone || ''}
                 onChange={(e) => setSettings({ ...settings, primaryPhone: e.target.value })}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Secondary Phone (Rahul Bisht)</label>
+              <label className="form-label">Secondary Helpline</label>
               <input
+                id="setting-secondaryPhone"
+                name="secondaryPhone"
                 type="text"
                 className="form-input"
                 value={settings.secondaryPhone || ''}
                 onChange={(e) => setSettings({ ...settings, secondaryPhone: e.target.value })}
               />
             </div>
-          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
             <div className="form-group">
-              <label className="form-label">WhatsApp Helpline (Without +)</label>
+              <label className="form-label">Alternate Director Line</label>
               <input
+                id="setting-altPhone"
+                name="altPhone"
                 type="text"
                 className="form-input"
-                value={settings.whatsappNumber}
-                onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
+                value={settings.altPhone || ''}
+                onChange={(e) => setSettings({ ...settings, altPhone: e.target.value })}
               />
             </div>
 
             <div className="form-group">
               <label className="form-label">Primary Official Email</label>
               <input
+                id="setting-primaryEmail"
+                name="primaryEmail"
                 type="email"
                 className="form-input"
-                value={settings.primaryEmail}
+                value={settings.primaryEmail || ''}
                 onChange={(e) => setSettings({ ...settings, primaryEmail: e.target.value })}
               />
             </div>
@@ -162,9 +208,10 @@ export default function AdminSettingsPage() {
 
           <button
             type="submit"
+            id="btn-save-settings"
             disabled={saving}
             className="btn-primary"
-            style={{ marginTop: '1rem', padding: '0.85rem 2rem' }}
+            style={{ marginTop: '1.5rem', padding: '0.85rem 2rem' }}
           >
             {saving ? (
               <>
@@ -179,6 +226,67 @@ export default function AdminSettingsPage() {
           </button>
         </form>
       </div>
+
+      {/* Bulletproof DOM Fallback for saving settings without React chunks */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              function initSettings() {
+                var form = document.getElementById('corporate-settings-form');
+                if (!form || form.getAttribute('data-bound') === 'true') return;
+                form.setAttribute('data-bound', 'true');
+
+                form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  var btn = document.getElementById('btn-save-settings');
+                  var alertBox = document.getElementById('settings-success-alert');
+
+                  var payload = {
+                    companyName: (document.getElementById('setting-companyName') || {}).value,
+                    cin: (document.getElementById('setting-cin') || {}).value,
+                    tagline: (document.getElementById('setting-tagline') || {}).value,
+                    whatsappNumber: (document.getElementById('setting-whatsappNumber') || {}).value,
+                    officeAddress: (document.getElementById('setting-officeAddress') || {}).value,
+                    primaryPhone: (document.getElementById('setting-primaryPhone') || {}).value,
+                    secondaryPhone: (document.getElementById('setting-secondaryPhone') || {}).value,
+                    altPhone: (document.getElementById('setting-altPhone') || {}).value,
+                    primaryEmail: (document.getElementById('setting-primaryEmail') || {}).value
+                  };
+
+                  if (btn) btn.innerText = 'Saving Changes...';
+
+                  fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                  })
+                  .then(function(res) {
+                    if (res.ok) {
+                      if (alertBox) {
+                        alertBox.style.display = 'flex';
+                        setTimeout(function() { alertBox.style.display = 'none'; }, 4000);
+                      }
+                    }
+                  })
+                  .catch(function(err) {
+                    console.error('Settings save error:', err);
+                  })
+                  .finally(function() {
+                    if (btn) btn.innerText = 'Save Corporate Settings';
+                  });
+                });
+              }
+
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSettings);
+              } else {
+                initSettings();
+              }
+            })();
+          `,
+        }}
+      />
     </div>
   );
 }

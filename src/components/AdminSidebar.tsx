@@ -16,7 +16,9 @@ import {
   LogOut,
   Building,
   UserCheck,
-  ShieldAlert
+  ShieldAlert,
+  Film,
+  BookOpen
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -37,9 +39,8 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     } catch (e) {}
     if (typeof window !== 'undefined') {
       localStorage.removeItem('osb_user');
+      window.location.href = '/admin/login';
     }
-    router.push('/admin/login');
-    router.refresh();
   };
 
   const navItems = [
@@ -49,6 +50,8 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
     { label: 'Follow-ups Queue', href: '/admin/follow-ups', icon: <PhoneCall size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER', 'SALES_EXECUTIVE'] },
     { label: 'Site Visits', href: '/admin/site-visits', icon: <Calendar size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER', 'SALES_EXECUTIVE'] },
     { label: 'Bookings Ledger', href: '/admin/bookings', icon: <FileText size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER'] },
+    { label: 'Video Gallery', href: '/admin/videos', icon: <Film size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER'] },
+    { label: 'Blog Articles', href: '/admin/blogs', icon: <BookOpen size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER'] },
     { label: 'Reports & Export', href: '/admin/reports', icon: <BarChart3 size={18} />, roles: ['SUPER_ADMIN', 'ADMIN', 'SALES_MANAGER'] },
     { label: 'System Settings', href: '/admin/settings', icon: <Settings size={18} />, roles: ['SUPER_ADMIN', 'ADMIN'] },
   ];

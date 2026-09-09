@@ -55,8 +55,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/pricing" style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Official Price List &amp; Payment Plans
+                </Link>
+              </li>
+              <li>
                 <Link href="/plots" style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Live Plot Inventory & Pricing
+                  <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Live Plot Inventory &amp; Pricing
                 </Link>
               </li>
               <li>
@@ -75,7 +80,7 @@ export default function Footer() {
           {/* Column 3: Corporate Contacts */}
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '1.3rem', marginBottom: '1.25rem', position: 'relative', paddingBottom: '0.5rem' }}>
-              Executive Contacts
+              Leadership &amp; Advisory
               <span style={{ position: 'absolute', bottom: 0, left: 0, width: '36px', height: '2px', backgroundColor: 'var(--gold)' }} />
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem', fontSize: '0.875rem' }}>

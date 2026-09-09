@@ -1,0 +1,98 @@
+[
+  {
+    "id": "cmtu3tblt001mv1lcqxs08r6f",
+    "bookingNumber": "OSB-2026-002",
+    "customerId": "cmtu3tbln001kv1lcd0687woz",
+    "projectId": "cmtttzn7g0004v1e858pzpnl9",
+    "plotId": "cmtu3tbhe000mv1lcno2oooar",
+    "salesUserId": "cmtttzn6k0001v1e8pvvc21bi",
+    "bookingDate": "2026-09-09T12:58:10.050Z",
+    "bookingAmount": 1760000,
+    "totalPropertyValue": 1760000,
+    "paymentMode": "RTGS",
+    "paymentReference": "RTGS11223344",
+    "status": "COMPLETED",
+    "remarks": "Registry completed, ownership handed over",
+    "createdAt": "2026-09-09T12:58:10.050Z",
+    "updatedAt": "2026-09-09T12:58:10.050Z",
+    "customer": {
+      "id": "cmtu3tbln001kv1lcd0687woz",
+      "name": "Vikas Patel",
+      "phone": "+919825544332",
+      "email": "vikas.patel@ahmedabadre.com",
+      "panNumber": "BNXPP5678K",
+      "aadharNumber": null,
+      "fullAddress": "Satellite Road, Ahmedabad, Gujarat 380015",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "convertedFromLeadId": null,
+      "notes": "Registered buyer, full payment cleared",
+      "createdAt": "2026-09-09T12:58:10.044Z",
+      "updatedAt": "2026-09-09T12:58:10.044Z"
+    },
+    "project": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots",
+      "location": "Dholera Special Investment Region (SIR)"
+    },
+    "plot": {
+      "id": "cmtu3tbhe000mv1lcno2oooar",
+      "plotNumber": "B-201",
+      "sizeSqYd": 200,
+      "priceTotal": 1760000
+    },
+    "salesUser": {
+      "id": "cmtttzn6k0001v1e8pvvc21bi",
+      "name": "Rahul Bisht",
+      "email": "rahulbisht@omswastikbuildhomes.com"
+    }
+  },
+  {
+    "id": "cmtu3tblf001jv1lcqcf4w8j3",
+    "bookingNumber": "OSB-2026-001",
+    "customerId": "cmtu3tbla001hv1lcmmgw3n50",
+    "projectId": "cmtttzn7g0004v1e858pzpnl9",
+    "plotId": "cmtu3tbh4000kv1lcbmw0lxuc",
+    "salesUserId": "cmtttzn6y0003v1e8688zgcm9",
+    "bookingDate": "2026-09-09T12:58:10.035Z",
+    "bookingAmount": 51000,
+    "totalPropertyValue": 1125000,
+    "paymentMode": "NEFT",
+    "paymentReference": "NEFT99881122",
+    "status": "BOOKED",
+    "remarks": "Booking advance received, agreement in drafting",
+    "createdAt": "2026-09-09T12:58:10.035Z",
+    "updatedAt": "2026-09-09T12:58:10.035Z",
+    "customer": {
+      "id": "cmtu3tbla001hv1lcmmgw3n50",
+      "name": "Rajiv Sharma",
+      "phone": "+919871122334",
+      "email": "rajiv.sharma@gmail.com",
+      "panNumber": "ABCPS1234F",
+      "aadharNumber": null,
+      "fullAddress": "Sector 15, Rohini, New Delhi 110085",
+      "city": "Delhi",
+      "state": "Delhi",
+      "convertedFromLeadId": null,
+      "notes": "Investor interested in Dholera semiconductor expansion",
+      "createdAt": "2026-09-09T12:58:10.030Z",
+      "updatedAt": "2026-09-09T12:58:10.030Z"
+    },
+    "project": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots",
+      "location": "Dholera Special Investment Region (SIR)"
+    },
+    "plot": {
+      "id": "cmtu3tbh4000kv1lcbmw0lxuc",
+      "plotNumber": "A-108",
+      "sizeSqYd": 150,
+      "priceTotal": 1125000
+    },
+    "salesUser": {
+      "id": "cmtttzn6y0003v1e8688zgcm9",
+      "name": "Santosh Gupta",
+      "email": "santoshgupta@omswastikbuildhomes.com"
+    }
+  }
+]

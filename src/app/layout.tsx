@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import GlobalLeadModals from '@/components/GlobalLeadModals';
 
 export const metadata: Metadata = {
   title: 'Om Swastik Buildhomes | Riddhi Premium Plots Dholera SIR',
@@ -44,8 +45,11 @@ export const metadata: Metadata = {
     images: ['/images/hero-dholera.jpg'],
   },
   icons: {
-    icon: '/favicon.ico',
-    apple: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+    ],
+    apple: '/apple-touch-icon.png',
   },
 };
 
@@ -63,6 +67,7 @@ export default function RootLayout({
       </head>
       <body>
         {children}
+        <GlobalLeadModals />
       </body>
     </html>
   );

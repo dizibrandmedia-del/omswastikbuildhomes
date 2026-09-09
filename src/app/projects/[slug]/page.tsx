@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WhatsAppFloatingBtn from '@/components/WhatsAppFloatingBtn';
 import PlotInventoryViewer from '@/components/PlotInventoryViewer';
+import PricingSection from '@/components/PricingSection';
 import {
   MapPin,
   CheckCircle2,
@@ -261,6 +262,9 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
           <PlotInventoryViewer plots={project.plots as any} projectName={project.name} projectId={project.id} />
         </div>
       </section>
+
+      {/* PROJECT OFFICIAL PRICING & PAYMENT PLAN */}
+      <PricingSection id="pricing" />
 
       {/* AMENITIES & INFRASTRUCTURE */}
       <section className="section-padding" style={{ backgroundColor: 'var(--primary-dark)', color: '#ffffff' }}>

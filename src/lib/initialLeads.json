@@ -1,0 +1,220 @@
+[
+  {
+    "id": "lead_001_sunita",
+    "name": "Sunita Aggarwal",
+    "mobile": "+919910223344",
+    "email": "sunita.aggarwal@gmail.com",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": null,
+    "budget": "₹15 - 20 Lakhs",
+    "preferredSize": "200 Sq. Yd.",
+    "locationPreference": "North Facing",
+    "requirement": "Corner plot preferred near park",
+    "leadSource": "WHATSAPP",
+    "assignedUserId": "usr_santosh",
+    "status": "SITE_VISIT_SCHEDULED",
+    "remarks": "Confirmed site visit from Noida office",
+    "nextFollowUpDate": "2026-09-12T10:00:00.000Z",
+    "createdAt": "2026-09-09T12:58:10.071Z",
+    "updatedAt": "2026-09-09T12:58:10.071Z",
+    "assignedUser": {
+      "id": "usr_santosh",
+      "name": "Santosh Gupta",
+      "role": "SALES_EXECUTIVE"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": null,
+    "followUps": [],
+    "siteVisits": [
+      {
+        "id": "visit_001",
+        "leadId": "lead_001_sunita",
+        "projectId": "cmtttzn7g0004v1e858pzpnl9",
+        "plotId": null,
+        "assignedUserId": "usr_santosh",
+        "visitDate": "2026-09-12T11:00:00.000Z",
+        "visitTime": "Morning (10:00 AM - 1:00 PM)",
+        "status": "SCHEDULED",
+        "remarks": "Client traveling with family to inspect Block A and B plots."
+      }
+    ]
+  },
+  {
+    "id": "lead_002_amitabh",
+    "name": "Amitabh Verma",
+    "mobile": "+919811002233",
+    "email": "amitabh.v@outlook.com",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": null,
+    "budget": "₹10 - 15 Lakhs",
+    "preferredSize": "150 - 200 Sq. Yd.",
+    "locationPreference": "East Facing",
+    "requirement": "Looking for 150 Sq. Yd. with 30ft road",
+    "leadSource": "WEBSITE",
+    "assignedUserId": "usr_praful",
+    "status": "FOLLOW_UP",
+    "remarks": "Interested in North-facing 200 Sq. Yd. plot for long-term investment",
+    "nextFollowUpDate": "2026-09-10T14:30:00.000Z",
+    "createdAt": "2026-09-09T12:58:10.061Z",
+    "updatedAt": "2026-09-09T12:58:10.061Z",
+    "assignedUser": {
+      "id": "usr_praful",
+      "name": "Praful Singh",
+      "role": "SALES_MANAGER"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": null,
+    "followUps": [
+      {
+        "id": "fu_001",
+        "leadId": "lead_002_amitabh",
+        "userId": "usr_praful",
+        "callStatus": "ANSWERED",
+        "remarks": "Customer discussed Dholera airport timeline and expressway connectivity. Requested brochure and site layout.",
+        "customerRequirement": "Looking for 200 Sq. Yd. plot with 30ft road width",
+        "nextAction": "Send site visit invitation for this weekend",
+        "nextFollowUpDate": "2026-09-10T14:30:00.000Z",
+        "createdAt": "2026-09-09T12:58:10.066Z"
+      }
+    ],
+    "siteVisits": []
+  },
+  {
+    "id": "lead_003_vikram",
+    "name": "Vikram Singhania",
+    "mobile": "+919876543210",
+    "email": "vikram.singhania@apexindustries.in",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": "cmtu3tbk20018v1lchml0cg8z",
+    "budget": "₹22 - 30 Lakhs",
+    "preferredSize": "250 Sq. Yd.",
+    "locationPreference": "Commercial / Main Road",
+    "requirement": "Corner plot with direct expressway connectivity",
+    "leadSource": "PORTAL_ENQUIRY",
+    "assignedUserId": "usr_rahul",
+    "status": "NEGOTIATION",
+    "remarks": "Reviewing Flexi payment structure (40:50 plan). Ready to transfer confirmation advance.",
+    "nextFollowUpDate": "2026-09-11T16:00:00.000Z",
+    "createdAt": "2026-09-08T11:20:00.000Z",
+    "updatedAt": "2026-09-08T11:20:00.000Z",
+    "assignedUser": {
+      "id": "usr_rahul",
+      "name": "Rahul Bisht",
+      "role": "ADMIN"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": {
+      "id": "cmtu3tbk20018v1lchml0cg8z",
+      "plotNumber": "B-210",
+      "priceTotal": 2040000
+    },
+    "followUps": [],
+    "siteVisits": []
+  },
+  {
+    "id": "lead_004_rajesh",
+    "name": "Rajesh Mehta",
+    "mobile": "+919822019944",
+    "email": "rajesh.mehta@gujaratsteel.com",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": null,
+    "budget": "₹11 - 15 Lakhs",
+    "preferredSize": "150 Sq. Yd.",
+    "locationPreference": "East Facing",
+    "requirement": "Residential plot for immediate registry",
+    "leadSource": "DIRECT_CALL",
+    "assignedUserId": "usr_santosh",
+    "status": "NEW",
+    "remarks": "Inquired through website banner. Needs callback regarding legal clear title papers.",
+    "nextFollowUpDate": "2026-09-10T11:00:00.000Z",
+    "createdAt": "2026-09-10T01:15:00.000Z",
+    "updatedAt": "2026-09-10T01:15:00.000Z",
+    "assignedUser": {
+      "id": "usr_santosh",
+      "name": "Santosh Gupta",
+      "role": "SALES_EXECUTIVE"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": null,
+    "followUps": [],
+    "siteVisits": []
+  },
+  {
+    "id": "lead_005_dr_neha",
+    "name": "Dr. Neha Sharma",
+    "mobile": "+919711884422",
+    "email": "drneha.sharma@apollohospitals.com",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": null,
+    "budget": "₹15 - 20 Lakhs",
+    "preferredSize": "200 Sq. Yd.",
+    "locationPreference": "North East Facing",
+    "requirement": "Vastu compliant corner plot",
+    "leadSource": "WEBSITE",
+    "assignedUserId": "usr_praful",
+    "status": "CONTACTED",
+    "remarks": "Introductory call completed. Shared project brochure and layout map on WhatsApp.",
+    "nextFollowUpDate": "2026-09-11T12:00:00.000Z",
+    "createdAt": "2026-09-09T16:40:00.000Z",
+    "updatedAt": "2026-09-09T16:40:00.000Z",
+    "assignedUser": {
+      "id": "usr_praful",
+      "name": "Praful Singh",
+      "role": "SALES_MANAGER"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": null,
+    "followUps": [],
+    "siteVisits": []
+  },
+  {
+    "id": "lead_006_manish",
+    "name": "Manish Kothari",
+    "mobile": "+919425091122",
+    "email": "manish.k@kotharitraders.in",
+    "interestedProjectId": "cmtttzn7g0004v1e858pzpnl9",
+    "interestedPlotId": "cmtu3tbfr0006v1lcpu562w8k",
+    "budget": "₹11.25 Lakhs",
+    "preferredSize": "150 Sq. Yd.",
+    "locationPreference": "East Facing",
+    "requirement": "Plot #A-101",
+    "leadSource": "REFERRAL",
+    "assignedUserId": "usr_admin",
+    "status": "BOOKING",
+    "remarks": "Plot A-101 selected. Booking advance ₹51,000 Cheque submitted. Awaiting allotment letter.",
+    "nextFollowUpDate": null,
+    "createdAt": "2026-09-07T14:10:00.000Z",
+    "updatedAt": "2026-09-07T14:10:00.000Z",
+    "assignedUser": {
+      "id": "usr_admin",
+      "name": "Super Admin",
+      "role": "SUPER_ADMIN"
+    },
+    "interestedProject": {
+      "id": "cmtttzn7g0004v1e858pzpnl9",
+      "name": "Riddhi Premium Plots"
+    },
+    "interestedPlot": {
+      "id": "cmtu3tbfr0006v1lcpu562w8k",
+      "plotNumber": "A-101",
+      "priceTotal": 1125000
+    },
+    "followUps": [],
+    "siteVisits": []
+  }
+]

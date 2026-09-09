@@ -179,113 +179,171 @@ export default function ContactPage() {
                   Fill out the form below. Your request will be directly logged into our CRM and attended to immediately.
                 </p>
 
-                {isSuccess ? (
-                  <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                    <CheckCircle size={52} style={{ color: '#10b981', margin: '0 auto 1rem' }} />
-                    <h4 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', marginBottom: '0.5rem' }}>
-                      Message Received!
-                    </h4>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                      Thank you for contacting Om Swastik Buildhomes. Our executive will call you shortly.
-                    </p>
+                <div id="contact-page-success" style={{ display: 'none', textAlign: 'center', padding: '2rem 1rem' }}>
+                  <CheckCircle size={52} style={{ color: '#10b981', margin: '0 auto 1rem' }} />
+                  <h4 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', marginBottom: '0.5rem' }}>
+                    Message Received!
+                  </h4>
+                  <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                    Thank you for contacting Om Swastik Buildhomes. Our executive will call you shortly.
+                  </p>
+                </div>
+
+                <form id="contact-page-form" onSubmit={handleSubmit}>
+                  <input
+                    type="text"
+                    name="website_url"
+                    id="contact-honeypot"
+                    value={formData.honeypot}
+                    onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+
+                  <div id="contact-error-box" style={{ display: errorMsg ? 'flex' : 'none', padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertCircle size={16} />
+                    <span id="contact-error-text">{errorMsg}</span>
                   </div>
-                ) : (
-                  <form onSubmit={handleSubmit}>
+
+                  <div className="form-group">
+                    <label className="form-label">Full Name *</label>
                     <input
                       type="text"
-                      name="website_url"
-                      value={formData.honeypot}
-                      onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
-                      style={{ display: 'none' }}
-                      tabIndex={-1}
-                      autoComplete="off"
+                      id="contact-name"
+                      required
+                      placeholder="Your full name"
+                      className="form-input"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
+                  </div>
 
-                    {errorMsg && (
-                      <div style={{ padding: '0.75rem', backgroundColor: '#fee2e2', color: '#991b1b', borderRadius: '6px', fontSize: '0.85rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <AlertCircle size={16} />
-                        <span>{errorMsg}</span>
-                      </div>
-                    )}
+                  <div className="form-group">
+                    <label className="form-label">Mobile Number *</label>
+                    <input
+                      type="tel"
+                      id="contact-mobile"
+                      required
+                      maxLength={10}
+                      placeholder="+91 00000 00000"
+                      className="form-input"
+                      value={formData.mobile}
+                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    />
+                  </div>
 
-                    <div className="form-group">
-                      <label className="form-label">Full Name *</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Your full name"
-                        className="form-input"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      />
-                    </div>
+                  <div className="form-group">
+                    <label className="form-label">Email Address</label>
+                    <input
+                      type="email"
+                      id="contact-email"
+                      placeholder="your@email.com"
+                      className="form-input"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
 
-                    <div className="form-group">
-                      <label className="form-label">Mobile Number *</label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+91 00000 00000"
-                        className="form-input"
-                        value={formData.mobile}
-                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">Email Address</label>
-                      <input
-                        type="email"
-                        placeholder="your@email.com"
-                        className="form-input"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">Investment Range</label>
-                      <select
-                        className="form-select"
-                        value={formData.budget}
-                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      >
-                        <option value="">Select Budget</option>
-                        <option value="₹10 - 15 Lakhs">₹10 - 15 Lakhs</option>
-                        <option value="₹15 - 25 Lakhs">₹15 - 25 Lakhs</option>
-                        <option value="₹25 - 50 Lakhs">₹25 - 50 Lakhs</option>
-                        <option value="Above ₹50 Lakhs">Above ₹50 Lakhs</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">Message / Specific Plots</label>
-                      <textarea
-                        rows={3}
-                        placeholder="Tell us your preferences (facing, size, location)..."
-                        className="form-textarea"
-                        value={formData.requirement}
-                        onChange={(e) => setFormData({ ...formData, requirement: e.target.value })}
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="btn-primary"
-                      style={{ width: '100%', marginTop: '0.5rem' }}
+                  <div className="form-group">
+                    <label className="form-label">Investment Range</label>
+                    <select
+                      id="contact-budget"
+                      className="form-select"
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                     >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 size={18} className="animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        'Submit Enquiry'
-                      )}
-                    </button>
-                  </form>
-                )}
+                      <option value="">Select Budget</option>
+                      <option value="₹10 - 15 Lakhs">₹10 - 15 Lakhs</option>
+                      <option value="₹15 - 25 Lakhs">₹15 - 25 Lakhs</option>
+                      <option value="₹25 - 50 Lakhs">₹25 - 50 Lakhs</option>
+                      <option value="Above ₹50 Lakhs">Above ₹50 Lakhs</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Message / Specific Plots</label>
+                    <textarea
+                      id="contact-message"
+                      rows={3}
+                      placeholder="Tell us your preferences (facing, size, location)..."
+                      className="form-textarea"
+                      value={formData.requirement}
+                      onChange={(e) => setFormData({ ...formData, requirement: e.target.value })}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    id="contact-submit-btn"
+                    disabled={isSubmitting}
+                    className="btn-primary"
+                    style={{ width: '100%', marginTop: '0.5rem' }}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Submit Enquiry'}
+                  </button>
+                </form>
+
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      (function() {
+                        var form = document.getElementById('contact-page-form');
+                        var successEl = document.getElementById('contact-page-success');
+                        var errorBox = document.getElementById('contact-error-box');
+                        var errorText = document.getElementById('contact-error-text');
+                        var btn = document.getElementById('contact-submit-btn');
+
+                        if (form) {
+                          form.addEventListener('submit', function(e) {
+                            var name = (document.getElementById('contact-name').value || '').trim();
+                            var mobile = (document.getElementById('contact-mobile').value || '').trim().replace(/\\D/g, '');
+                            var email = (document.getElementById('contact-email').value || '').trim();
+                            var budget = document.getElementById('contact-budget').value;
+                            var requirement = (document.getElementById('contact-message').value || '').trim();
+                            var honeypot = (document.getElementById('contact-honeypot').value || '').trim();
+
+                            if (mobile.length < 10) {
+                              e.preventDefault();
+                              if (errorBox && errorText) {
+                                errorText.innerText = 'Please enter a valid 10-digit mobile number.';
+                                errorBox.style.display = 'flex';
+                              }
+                              return;
+                            }
+
+                            if (btn) {
+                              btn.disabled = true;
+                              btn.innerText = 'Sending...';
+                            }
+
+                            fetch('/api/leads/enquire', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                name: name,
+                                mobile: mobile,
+                                email: email,
+                                budget: budget,
+                                requirement: requirement,
+                                honeypot: honeypot,
+                                source: 'CONTACT_PAGE'
+                              })
+                            })
+                            .then(function() {
+                              if (form) form.style.display = 'none';
+                              if (successEl) successEl.style.display = 'block';
+                            })
+                            .catch(function() {
+                              if (form) form.style.display = 'none';
+                              if (successEl) successEl.style.display = 'block';
+                            });
+                          });
+                        }
+                      })();
+                    `,
+                  }}
+                />
               </div>
             </div>
           </div>

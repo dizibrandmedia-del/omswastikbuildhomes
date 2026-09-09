@@ -85,7 +85,7 @@ export default async function PlotDetailPage({ params }: PlotDetailPageProps) {
 
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Total Property Value</div>
-              <div style={{ fontSize: '2.4rem', fontWeight: 700, color: 'var(--gold)', fontFamily: 'var(--font-heading)' }}>
+              <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--gold)', fontFamily: 'var(--font-body)', letterSpacing: '-0.02em' }}>
                 {formatCurrency(plot.priceTotal)}
               </div>
               <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>
