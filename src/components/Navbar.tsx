@@ -12,8 +12,22 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top Corporate Bar */}
-      <div style={{ backgroundColor: '#00363a', borderBottom: '1px solid rgba(228, 170, 60, 0.2)' }} className="py-2 text-xs text-white/80">
+      {/* Top Corporate Bar - Hidden on mobile screens */}
+      <div className="top-corporate-bar">
+        <style jsx>{`
+          .top-corporate-bar {
+            background-color: #00363a;
+            border-bottom: 1px solid rgba(228, 170, 60, 0.2);
+            padding: 0.5rem 0;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+          }
+          @media (max-width: 991px) {
+            .top-corporate-bar {
+              display: none !important;
+            }
+          }
+        `}</style>
         <div className="container-custom" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
