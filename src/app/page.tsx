@@ -384,23 +384,26 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* PARTNER LOGOS CAROUSEL */}
-      <section style={{ backgroundColor: 'var(--primary-dark)', padding: '3.5rem 0', color: '#ffffff' }}>
-        <div className="container-custom">
-          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-            <span style={{ color: 'var(--gold)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
-              Industrial Ecosystem &amp; Global Confidence
+      {/* INDUSTRIAL ECOSYSTEM & GLOBAL CONFIDENCE */}
+      <section style={{ backgroundColor: 'var(--primary-dark)', padding: '5rem 0', color: '#ffffff' }}>
+        <div className="container-custom" style={{ maxWidth: '1160px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <span style={{ color: 'var(--gold)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 600 }}>
+              Industrial Ecosystem
             </span>
-            <h3 style={{ color: '#ffffff', fontSize: '1.8rem', marginTop: '0.25rem' }}>
-              Global Leaders Investing in Dholera
-            </h3>
+            <h2 style={{ color: '#ffffff', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginTop: '0.5rem', marginBottom: '0.75rem', fontWeight: 600 }}>
+              Global Leaders Investing
+            </h2>
+            <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '1.05rem', maxWidth: '640px', margin: '0 auto', lineHeight: 1.6 }}>
+              Major corporations are committing to Dholera&apos;s industrial ecosystem.
+            </p>
           </div>
 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-              gap: '2rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '1.5rem',
               alignItems: 'center',
             }}
           >
@@ -408,22 +411,24 @@ export default async function HomePage() {
               <div
                 key={partner.name}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  padding: '1.25rem',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundColor: '#ffffff',
+                  padding: '1.5rem 1.25rem',
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  height: '80px',
+                  minHeight: '115px',
+                  border: '1px solid rgba(228, 170, 60, 0.25)',
+                  transition: 'all 0.3s ease',
                 }}
               >
-                <div style={{ position: 'relative', width: '100px', height: '45px' }}>
+                <div style={{ position: 'relative', width: '170px', height: '60px' }}>
                   <Image
                     src={partner.src}
-                    alt={partner.name}
+                    alt={`${partner.name} investing in Dholera`}
                     fill
-                    style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.85 }}
+                    style={{ objectFit: 'contain' }}
                   />
                 </div>
               </div>

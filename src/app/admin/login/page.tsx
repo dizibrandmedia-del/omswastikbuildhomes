@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, Loader2, AlertCircle, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -61,11 +61,6 @@ export default function AdminLoginPage() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const fillCredentials = (userEmail: string) => {
-    setEmail(userEmail);
-    setPassword('Admin@12345');
   };
 
   return (
@@ -171,80 +166,6 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
-
-        {/* Quick Role Fillers for Review & Verification */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem' }}>
-            <ShieldCheck size={14} style={{ color: 'var(--gold-deep)' }} />
-            <span>Select Staff Role to Auto-Fill:</span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.75rem' }}>
-            <button
-              type="button"
-              onClick={() => fillCredentials('admin@omswastikbuildhomes.com')}
-              style={{
-                padding: '0.5rem',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <strong style={{ color: 'var(--primary)' }}>Super Admin</strong>
-              <div style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Full System Access</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillCredentials('rahulbisht@omswastikbuildhomes.com')}
-              style={{
-                padding: '0.5rem',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <strong style={{ color: 'var(--primary)' }}>Rahul Bisht</strong>
-              <div style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Director / Admin</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillCredentials('prafulsingh@omswastikbuildhomes.com')}
-              style={{
-                padding: '0.5rem',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <strong style={{ color: 'var(--primary)' }}>Praful Singh</strong>
-              <div style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Sales Manager</div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => fillCredentials('santoshgupta@omswastikbuildhomes.com')}
-              style={{
-                padding: '0.5rem',
-                backgroundColor: '#f8fafc',
-                border: '1px solid #cbd5e1',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <strong style={{ color: 'var(--primary)' }}>Santosh Gupta</strong>
-              <div style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Sales Executive</div>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
