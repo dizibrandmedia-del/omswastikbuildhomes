@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { FileText, ShieldCheck, Download, Plus } from 'lucide-react';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function AdminBookingsPage() {
   const bookings = await prisma.booking.findMany({

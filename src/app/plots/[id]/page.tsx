@@ -25,6 +25,11 @@ interface PlotDetailPageProps {
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const plots = await prisma.plot.findMany({ select: { id: true } });
+  return plots.map((p) => ({ id: p.id }));
+}
+
 export default async function PlotDetailPage({ params }: PlotDetailPageProps) {
   const { id } = await params;
 

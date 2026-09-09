@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 import { formatDate } from '@/lib/utils';
 import { Calendar, Phone, MapPin, CheckCircle, Clock } from 'lucide-react';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function AdminSiteVisitsPage() {
   const siteVisits = await prisma.siteVisit.findMany({

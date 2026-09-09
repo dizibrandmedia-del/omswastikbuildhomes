@@ -23,6 +23,7 @@ prisma/dev.db-journal
 
 # Scratch & Temporary
 scratch/
+public_html_ready/
 *.zip
 *.log
 npm-debug.log*

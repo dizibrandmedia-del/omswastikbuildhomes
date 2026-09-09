@@ -16,7 +16,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export const revalidate = 0; // Dynamic data
+export const revalidate = 60;
 
 export default async function AdminDashboardPage() {
   const [

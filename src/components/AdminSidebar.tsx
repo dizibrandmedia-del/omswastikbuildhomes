@@ -32,7 +32,12 @@ export default function AdminSidebar({ user }: AdminSidebarProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {}
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('osb_user');
+    }
     router.push('/admin/login');
     router.refresh();
   };

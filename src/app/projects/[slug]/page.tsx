@@ -25,6 +25,11 @@ interface ProjectDetailProps {
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  const projects = await prisma.project.findMany({ select: { slug: true } });
+  return projects.map((p) => ({ slug: p.slug }));
+}
+
 export default async function ProjectDetailPage({ params }: ProjectDetailProps) {
   const { slug } = await params;
 

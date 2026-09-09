@@ -13,9 +13,6 @@
     "prisma:push": "prisma db push",
     "prisma:seed": "node prisma/seed.mjs"
   },
-  "prisma": {
-    "seed": "node prisma/seed.mjs"
-  },
   "dependencies": {
     "@prisma/client": "^6.3.0",
     "bcryptjs": "^2.4.3",
