@@ -1,0 +1,343 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         String    @default("SALES_EXECUTIVE") // SUPER_ADMIN, ADMIN, SALES_MANAGER, SALES_EXECUTIVE
+  isActive     Boolean   @default(true)
+  avatar       String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  assignedLeads     Lead[]        @relation("AssignedLeads")
+  followUps         FollowUp[]
+  siteVisits        SiteVisit[]   @relation("ExecutiveSiteVisits")
+  bookingsClosed    Booking[]     @relation("SalesExecutiveBookings")
+  activityLogs      ActivityLog[]
+
+  @@index([role])
+  @@index([isActive])
+}
+
+model Project {
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  name             String
+  projectType      String    @default("PLOTTED_DEVELOPMENT") // PLOTTED_DEVELOPMENT, RESIDENTIAL, COMMERCIAL, INDUSTRIAL
+  location         String
+  city             String
+  state            String    @default("Gujarat")
+  fullAddress      String?
+  description      String
+  highlights       String?   // JSON string of bullet highlights
+  totalProjectArea String?   // e.g. "50 Acres"
+  totalPlots       Int       @default(0)
+  amenitiesList    String?   // JSON string of amenity tags
+  nearbyLandmarks  String?   // JSON string of landmarks
+  connectivity     String?   // JSON string of connectivity points
+  googleMapUrl     String?
+  heroImage        String?
+  videoUrl         String?
+  brochureUrl      String?
+  siteLayoutImage  String?
+  reraNumber       String?
+  status           String    @default("ACTIVE") // UPCOMING, ACTIVE, READY_FOR_SALE, SOLD_OUT, INACTIVE
+  displayOrder     Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  plots            Plot[]
+  leads            Lead[]
+  siteVisits       SiteVisit[]
+  bookings         Booking[]
+  amenities        Amenity[]
+  locations        LocationAdvantage[]
+
+  @@index([status])
+  @@index([slug])
+}
+
+model Plot {
+  id               String    @id @default(cuid())
+  plotNumber       String
+  projectId        String
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sizeSqYd         Float
+  sizeSqFt         Float
+  lengthFt         Float?
+  widthFt          Float?
+  facing           String    @default("EAST") // NORTH, SOUTH, EAST, WEST, NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST
+  roadWidthFt      Float     @default(30)
+  isCorner         Boolean   @default(false)
+  isParkFacing     Boolean   @default(false)
+  isMainRoadFacing Boolean   @default(false)
+  priceTotal       Float
+  pricePerUnit     Float     // per Sq. Yd. or Sq. Ft.
+  bookingAmount    Float     @default(51000)
+  status           String    @default("AVAILABLE") // AVAILABLE, HOLD, BOOKED, SOLD, BLOCKED
+  holdUntil        DateTime?
+  remarks          String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  leads            Lead[]
+  siteVisits       SiteVisit[]
+  bookings         Booking[]
+
+  @@unique([projectId, plotNumber])
+  @@index([projectId, status])
+  @@index([status])
+}
+
+model Lead {
+  id                  String    @id @default(cuid())
+  name                String
+  mobile              String
+  email               String?
+  interestedProjectId String?
+  interestedProject   Project?  @relation(fields: [interestedProjectId], references: [id], onDelete: SetNull)
+  interestedPlotId    String?
+  interestedPlot      Plot?     @relation(fields: [interestedPlotId], references: [id], onDelete: SetNull)
+  budget              String?
+  preferredSize       String?
+  locationPreference  String?
+  requirement         String?
+  leadSource          String    @default("WEBSITE") // WEBSITE, PROJECT_PAGE, PLOT_PAGE, GOOGLE_ADS, META_ADS, LANDING_PAGE, WHATSAPP, DIRECT_CALL, MANUAL, OTHER
+  assignedUserId      String?
+  assignedUser        User?     @relation("AssignedLeads", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  status              String    @default("NEW") // NEW, CONTACTED, INTERESTED, FOLLOW_UP, SITE_VISIT_SCHEDULED, SITE_VISIT_DONE, NEGOTIATION, BOOKING, SOLD, LOST
+  remarks             String?
+  nextFollowUpDate    DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  followUps           FollowUp[]
+  siteVisits          SiteVisit[]
+  customer            Customer?
+  activityLogs        ActivityLog[]
+
+  @@index([status])
+  @@index([assignedUserId])
+  @@index([interestedProjectId])
+  @@index([createdAt])
+}
+
+model FollowUp {
+  id                  String    @id @default(cuid())
+  leadId              String
+  lead                Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scheduledAt         DateTime?
+  completedAt         DateTime?
+  callStatus          String?   // ANSWERED, UNANSWERED, BUSY, WRONG_NUMBER, CALLBACK_REQUESTED
+  remarks             String
+  customerRequirement String?
+  nextAction          String?
+  nextFollowUpDate    DateTime?
+  createdAt           DateTime  @default(now())
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([scheduledAt])
+}
+
+model SiteVisit {
+  id               String    @id @default(cuid())
+  leadId           String
+  lead             Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  projectId        String
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  plotId           String?
+  plot             Plot?     @relation(fields: [plotId], references: [id], onDelete: SetNull)
+  assignedUserId   String?
+  assignedUser     User?     @relation("ExecutiveSiteVisits", fields: [assignedUserId], references: [id], onDelete: SetNull)
+  visitDate        DateTime
+  visitTime        String?
+  status           String    @default("SCHEDULED") // SCHEDULED, CONFIRMED, COMPLETED, CANCELLED, RESCHEDULED
+  remarks          String?
+  postVisitRemarks String?
+  feedback         String?
+  nextAction       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([leadId])
+  @@index([projectId])
+  @@index([assignedUserId])
+  @@index([visitDate])
+  @@index([status])
+}
+
+model Customer {
+  id                   String    @id @default(cuid())
+  name                 String
+  phone                String
+  email                String?
+  panNumber            String?
+  aadharNumber         String?
+  fullAddress          String?
+  city                 String?
+  state                String?
+  convertedFromLeadId  String?   @unique
+  convertedFromLead    Lead?     @relation(fields: [convertedFromLeadId], references: [id], onDelete: SetNull)
+  notes                String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  bookings             Booking[]
+
+  @@index([phone])
+}
+
+model Booking {
+  id                 String    @id @default(cuid())
+  bookingNumber      String    @unique
+  customerId         String
+  customer           Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  projectId          String
+  project            Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  plotId             String
+  plot               Plot      @relation(fields: [plotId], references: [id], onDelete: Cascade)
+  salesUserId        String?
+  salesUser          User?     @relation("SalesExecutiveBookings", fields: [salesUserId], references: [id], onDelete: SetNull)
+  bookingDate        DateTime  @default(now())
+  bookingAmount      Float
+  totalPropertyValue Float
+  paymentMode        String    @default("CHEQUE") // CHEQUE, NEFT, RTGS, UPI, CASH
+  paymentReference   String?
+  status             String    @default("BOOKING_INITIATED") // BOOKING_INITIATED, BOOKED, DOCS_PENDING, PAYMENT_PENDING, COMPLETED, CANCELLED
+  remarks            String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([customerId])
+  @@index([projectId])
+  @@index([plotId])
+  @@index([status])
+}
+
+model BlogPost {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  featuredImage  String?
+  excerpt        String
+  content        String
+  author         String    @default("Om Swastik Research Team")
+  publishedAt    DateTime?
+  status         String    @default("DRAFT") // DRAFT, PUBLISHED, INACTIVE
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([status])
+  @@index([slug])
+}
+
+model Testimonial {
+  id           String    @id @default(cuid())
+  customerName String
+  designation  String?
+  review       String
+  rating       Int       @default(5)
+  avatarImage  String?
+  project      String?
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  @@index([isActive])
+}
+
+model Faq {
+  id           String    @id @default(cuid())
+  question     String
+  answer       String
+  category     String    @default("General") // General, Dholera SIR, Riddhi Plots, Investment, Legal
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+
+  @@index([category])
+  @@index([isActive])
+}
+
+model Amenity {
+  id           String    @id @default(cuid())
+  name         String
+  description  String?
+  icon         String?
+  projectId    String?
+  project      Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+
+  @@index([projectId])
+  @@index([isActive])
+}
+
+model LocationAdvantage {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  category     String    @default("Connectivity") // Connectivity, Industrial, Tourism, Infrastructure
+  distanceTime String?   // e.g. "15 mins drive", "Direct Access"
+  icon         String?
+  projectId    String?
+  project      Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  displayOrder Int       @default(0)
+
+  @@index([projectId])
+}
+
+model ContactSetting {
+  id                String   @id @default("default")
+  companyName       String   @default("Om Swastik Buildhomes Pvt. Ltd.")
+  tagline           String   @default("Building Trust. Creating Spaces.")
+  cin               String   @default("U41000UW2026PTC256814")
+  officeAddress     String   @default("Gaur World Smart Street, ASF-151, 2nd Floor, Sector 16B, Greater Noida West, U.P. 201318")
+  primaryPhone      String   @default("+919599213531")
+  secondaryPhone    String?  @default("+919810484742")
+  altPhone          String?  @default("+919990842233")
+  primaryEmail      String   @default("rahulbisht@omswastikbuildhomes.com")
+  altEmail          String?  @default("rahulbisht0802@gmail.com")
+  whatsappNumber    String   @default("919599213531")
+  googleMapEmbed    String?
+  facebookUrl       String?
+  instagramUrl      String?
+  linkedinUrl       String?
+  youtubeUrl        String?
+  twitterUrl        String?
+  updatedAt         DateTime @updatedAt
+}
+
+model ActivityLog {
+  id            String    @id @default(cuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action        String    // LEAD_CREATED, LEAD_ASSIGNED, STATUS_CHANGED, FOLLOW_UP_ADDED, VISIT_SCHEDULED, BOOKING_CREATED, etc.
+  entityType    String    // Lead, Plot, Booking, User, Project
+  entityId      String
+  leadId        String?
+  lead          Lead?     @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  previousValue String?
+  newValue      String?
+  details       String?
+  createdAt     DateTime  @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}
