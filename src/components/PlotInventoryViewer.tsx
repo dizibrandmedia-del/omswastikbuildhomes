@@ -5,11 +5,6 @@ import Link from 'next/link';
 import {
   Filter,
   Search,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-  Maximize2,
-  Minimize2,
   CheckCircle2,
   Compass,
   MessageCircle,
@@ -103,7 +98,6 @@ export default function PlotInventoryViewer({
   const [selectedFacing, setSelectedFacing] = useState<string>('ALL');
   const [onlyCorners, setOnlyCorners] = useState<boolean>(false);
   const [onlyParks, setOnlyParks] = useState<boolean>(false);
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [hoveredPlotNumber, setHoveredPlotNumber] = useState<string | null>(null);
 
   // Interactive EMI Calculator Modal State
@@ -111,13 +105,6 @@ export default function PlotInventoryViewer({
   const [emiLoanAmount, setEmiLoanAmount] = useState<number>(2000000);
   const [emiRate, setEmiRate] = useState<number>(8.5);
   const [emiTenureYears, setEmiTenureYears] = useState<number>(15);
-
-  // Pan & Zoom state for interactive Master Plan
-  const [zoom, setZoom] = useState<number>(1);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const mapViewportRef = useRef<HTMLDivElement>(null);
 
   // Sync with /api/plots if live updates arrive
   useEffect(() => {
@@ -175,64 +162,6 @@ export default function PlotInventoryViewer({
   const bookedCount = useMemo(() => plots.filter((p) => p.status === 'BOOKED').length, [plots]);
   const soldCount = useMemo(() => plots.filter((p) => p.status === 'SOLD').length, [plots]);
 
-  // Pan & Zoom controls
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 0.35, 3.5));
-  };
-
-  const handleZoomOut = () => {
-    setZoom((prev) => {
-      const next = Math.max(prev - 0.35, 1);
-      if (next === 1) setPan({ x: 0, y: 0 });
-      return next;
-    });
-  };
-
-  const handleResetZoom = () => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (zoom <= 1) return;
-    setIsDragging(true);
-    dragStartRef.current = { x: e.clientX - pan.x, y: e.clientY - pan.y };
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setPan({
-      x: e.clientX - dragStartRef.current.x,
-      y: e.clientY - dragStartRef.current.y,
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Touch controls for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length === 1 && zoom > 1) {
-      setIsDragging(true);
-      const touch = e.touches[0];
-      dragStartRef.current = { x: touch.clientX - pan.x, y: touch.clientY - pan.y };
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return;
-    const touch = e.touches[0];
-    setPan({
-      x: touch.clientX - dragStartRef.current.x,
-      y: touch.clientY - dragStartRef.current.y,
-    });
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-  };
-
   // Select plot
   const handleSelectPlot = (plot: PlotData) => {
     setSelectedPlot(plot);
@@ -243,23 +172,6 @@ export default function PlotInventoryViewer({
           inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }, 120);
-    }
-  };
-
-  // Focus a plot on the map
-  const handleFocusPlot = (plot: PlotData) => {
-    setSelectedPlot(plot);
-    if (plot.coords) {
-      setZoom(2.2);
-      // Center on plot coords (3513 x 2484 canvas)
-      const containerW = mapViewportRef.current?.clientWidth || 1000;
-      const containerH = mapViewportRef.current?.clientHeight || 650;
-      const targetCenterX = (plot.coords.x + plot.coords.w / 2) * (containerW / 3513);
-      const targetCenterY = (plot.coords.y + plot.coords.h / 2) * (containerH / 2484);
-      setPan({
-        x: (containerW / 2 - targetCenterX) * 0.8,
-        y: (containerH / 2 - targetCenterY) * 0.8,
-      });
     }
   };
 
@@ -499,7 +411,7 @@ export default function PlotInventoryViewer({
                 transition: 'all 0.2s ease',
               }}
             >
-              <Layers size={15} /> Master Plan Map
+              <Layers size={15} /> Project Layout Map
             </button>
 
             <button
@@ -645,334 +557,201 @@ export default function PlotInventoryViewer({
         className="master-plan-grid-container"
         style={{ display: activeTab === 'map' ? 'grid' : 'none' }}
       >
-          {/* Main Visual Map Canvas Container */}
+          {/* Main Visual Digital Layout Board (Matching User Reference Image 2) */}
           <div
+            id="digital-layout-board"
             style={{
-              background: '#040d13',
+              background: '#04131a',
               borderRadius: '16px',
-              border: '2px solid rgba(212, 175, 55, 0.4)',
+              border: '1px solid rgba(228, 170, 60, 0.35)',
               overflow: 'hidden',
               position: 'relative',
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
+              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.4)',
               display: 'flex',
               flexDirection: 'column',
+              width: '100%',
+              boxSizing: 'border-box',
             }}
           >
-            {/* Map Top Bar: Status Legend & Controls */}
+            {/* Top Row: Status Legend (Matching Reference Screenshot) */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                padding: '1rem 1.25rem',
+                background: 'rgba(3, 14, 20, 0.95)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                flexWrap: 'wrap',
+                gap: '1.5rem',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: '#e2e8f0', fontWeight: 500 }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#10b981', display: 'inline-block' }} />
+                <span>Available (Ready to Book)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: '#e2e8f0', fontWeight: 500 }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#f59e0b', display: 'inline-block' }} />
+                <span>On Hold (In Negotiation)</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: '#e2e8f0', fontWeight: 500 }}>
+                <span style={{ width: '12px', height: '12px', borderRadius: '3px', background: '#475569', display: 'inline-block' }} />
+                <span>Booked / Registered</span>
+              </div>
+            </div>
+
+            {/* Inner Header Row: Layout Title & Status Filter Dropdown (Matching Reference Screenshot) */}
             <div
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '0.75rem 1.25rem',
-                background: 'rgba(6, 17, 24, 0.92)',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                padding: '1rem 1.5rem',
+                background: 'rgba(6, 23, 31, 0.75)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
                 flexWrap: 'wrap',
-                gap: '0.75rem',
-                zIndex: 10,
+                gap: '1rem',
               }}
             >
-              {/* Status Legend */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#e2e8f0' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#10b981' }} />
-                  <span>Available ({availableCount})</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#e2e8f0' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
-                  <span>On Hold ({holdCount})</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#e2e8f0' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
-                  <span>Booked ({bookedCount})</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#e2e8f0' }}>
-                  <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#64748b' }} />
-                  <span>Sold ({soldCount})</span>
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Compass size={18} style={{ color: 'var(--gold)' }} />
+                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ffffff', margin: 0, letterSpacing: '0.02em' }}>
+                  Project Layout Map (Total {plots.length} Plots)
+                </h3>
               </div>
 
-              {/* Map Zoom Controls */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <button
-                  type="button"
-                  id="map-zoom-in-btn"
-                  onClick={handleZoomIn}
-                  title="Zoom In"
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <span style={{ fontSize: '0.82rem', color: '#94a3b8', fontWeight: 500 }}>Filter Status:</span>
+                <select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: '#071d24',
                     color: '#ffffff',
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <ZoomIn size={16} />
-                </button>
-
-                <button
-                  type="button"
-                  id="map-zoom-out-btn"
-                  onClick={handleZoomOut}
-                  title="Zoom Out"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: '#ffffff',
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <ZoomOut size={16} />
-                </button>
-
-                <button
-                  type="button"
-                  id="map-reset-btn"
-                  onClick={handleResetZoom}
-                  title="Reset Zoom & Pan"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: '#ffffff',
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    fontSize: '0.75rem',
+                    border: '1px solid rgba(228, 170, 60, 0.4)',
+                    borderRadius: '8px',
+                    padding: '0.45rem 1rem',
+                    fontSize: '0.82rem',
                     fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
                   }}
                 >
-                  <RotateCcw size={14} /> Reset ({Math.round(zoom * 100)}%)
-                </button>
+                  <option value="ALL">Show All ({plots.length} Plots)</option>
+                  <option value="AVAILABLE">Available ({availableCount} Plots)</option>
+                  <option value="HOLD">On Hold ({holdCount} Plots)</option>
+                  <option value="BOOKED">Booked ({bookedCount} Plots)</option>
+                  <option value="SOLD">Sold ({soldCount} Plots)</option>
+                </select>
               </div>
             </div>
 
-            {/* Draggable & Scalable Viewport */}
+            {/* The Plot Grid (P-01 to P-69 in clean responsive pills) */}
             <div
-              ref={mapViewportRef}
-              className="master-plan-canvas-wrap"
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
               style={{
-                cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
-                ...(isFullscreen ? { height: '85vh', minHeight: '85vh' } : {}),
+                padding: '1.5rem',
+                maxHeight: '620px',
+                overflowY: 'auto',
+                boxSizing: 'border-box',
               }}
             >
               <div
                 style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+                  gap: '9px',
                   width: '100%',
-                  height: '100%',
-                  transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-                  transformOrigin: 'center center',
-                  transition: isDragging ? 'none' : 'transform 0.18s ease-out',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}
               >
-                <svg
-                  viewBox="0 0 3513 2484"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '100%',
-                    display: 'block',
-                    pointerEvents: 'all',
-                  }}
-                >
-                  {/* SVG Glow & Shadow Filter Definitions */}
-                  <defs>
-                    <filter id="plot-glow-selected" x="-35%" y="-35%" width="170%" height="170%">
-                      <feDropShadow dx="0" dy="0" stdDeviation="14" floodColor="#facc15" floodOpacity="0.95" />
-                      <feDropShadow dx="0" dy="6" stdDeviation="16" floodColor="#000000" floodOpacity="0.75" />
-                    </filter>
-                    <filter id="plot-glow-hover" x="-25%" y="-25%" width="150%" height="150%">
-                      <feDropShadow dx="0" dy="0" stdDeviation="9" floodColor="#fde047" floodOpacity="0.9" />
-                      <feDropShadow dx="0" dy="4" stdDeviation="10" floodColor="#000000" floodOpacity="0.6" />
-                    </filter>
-                    <filter id="badge-shadow-lg" x="-30%" y="-30%" width="160%" height="160%">
-                      <feDropShadow dx="0" dy="3" stdDeviation="5" floodColor="#000000" floodOpacity="0.75" />
-                    </filter>
-                  </defs>
+                {filteredPlots.map((plot) => {
+                  const isSelected = selectedPlot?.plotNumber === plot.plotNumber;
+                  const isHovered = hoveredPlotNumber === plot.plotNumber;
+                  const isAvail = plot.status === 'AVAILABLE';
+                  const isHold = plot.status === 'HOLD';
+                  const isBooked = plot.status === 'BOOKED' || plot.status === 'SOLD';
 
-                  {/* High-resolution Master Plan image as base */}
-                  <image
-                    href="/om_swastik_master_plan.jpg"
-                    x="0"
-                    y="0"
-                    width="3513"
-                    height="2484"
-                    preserveAspectRatio="xMidYMid meet"
-                  />
+                  // Exact colors matching reference image 2
+                  let borderColor = '#10b981';
+                  let bgColor = '#032629';
+                  let textColor = '#34d399';
 
-                  {/* Interactive SVG Overlays for all 69 plots */}
-                  {plots.map((plot) => {
-                    const coords = plot.coords;
-                    if (!coords) return null;
-                    const isSelected = selectedPlot?.plotNumber === plot.plotNumber;
-                    const isHovered = hoveredPlotNumber === plot.plotNumber;
-                    const isMatch = filteredPlotNumbers.has(plot.plotNumber);
+                  if (isHold) {
+                    borderColor = '#f59e0b';
+                    bgColor = '#271b05';
+                    textColor = '#fbbf24';
+                  } else if (isBooked) {
+                    borderColor = '#334155';
+                    bgColor = '#0f172a';
+                    textColor = '#64748b';
+                  }
 
-                    const cx = coords.x + coords.w / 2;
-                    const cy = coords.y + coords.h / 2;
-                    const isNarrow = coords.w < 110;
+                  if (isSelected) {
+                    borderColor = '#facc15';
+                    bgColor = isAvail ? '#04353a' : isHold ? '#3a2707' : '#1e293b';
+                  }
 
-                    // Dynamic badge size: large & prominent for crystal-clear readability
-                    const baseBadgeW = isNarrow ? 76 : 84;
-                    const baseBadgeH = 54;
-                    const badgeW = isSelected ? baseBadgeW + 8 : isHovered ? baseBadgeW + 4 : baseBadgeW;
-                    const badgeH = isSelected ? baseBadgeH + 8 : isHovered ? baseBadgeH + 4 : baseBadgeH;
-                    const badgeX = cx - badgeW / 2;
-                    const badgeY = cy - badgeH / 2;
+                  const pNumDisplay = `P-${String(plot.plotNumber).padStart(2, '0')}`;
 
-                    // High-legibility font size (increased substantially from 20px)
-                    const fontSize = isSelected
-                      ? isNarrow ? 40 : 44
-                      : isHovered
-                      ? isNarrow ? 38 : 42
-                      : isNarrow ? 35 : 38;
-
-                    // Dynamic colors based on selection and hover
-                    const boundStroke = isSelected ? '#facc15' : isHovered ? '#fde047' : getStatusColor(plot.status);
-                    const boundStrokeWidth = isSelected ? 8 : isHovered ? 5.5 : 3;
-                    const boundFilter = isSelected ? 'url(#plot-glow-selected)' : isHovered ? 'url(#plot-glow-hover)' : 'none';
-
-                    const badgeFill = isSelected ? '#facc15' : isHovered ? '#00363a' : 'rgba(4, 26, 30, 0.94)';
-                    const badgeStroke = isSelected ? '#ffffff' : isHovered ? '#facc15' : 'rgba(228, 170, 60, 0.95)';
-                    const badgeStrokeWidth = isSelected ? 3.5 : isHovered ? 3 : 2.5;
-
-                    const textColor = isSelected ? '#002022' : isHovered ? '#fde047' : '#ffffff';
-
-                    return (
-                      <g
-                        key={plot.id}
-                        id={`svg-plot-${plot.plotNumber}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectPlot(plot);
-                        }}
-                        onMouseEnter={() => setHoveredPlotNumber(plot.plotNumber)}
-                        onMouseLeave={() => setHoveredPlotNumber(null)}
+                  return (
+                    <button
+                      key={plot.id || plot.plotNumber}
+                      type="button"
+                      id={`plot-unit-btn-${plot.plotNumber}`}
+                      onClick={() => handleSelectPlot(plot)}
+                      onMouseEnter={() => setHoveredPlotNumber(plot.plotNumber)}
+                      onMouseLeave={() => setHoveredPlotNumber(null)}
+                      title={`Plot #${plot.plotNumber} · ${plot.status} · 200 Sq. Yd. (${plot.facing} Facing)`}
+                      style={{
+                        background: bgColor,
+                        border: isSelected ? '2px solid #facc15' : `1.5px solid ${borderColor}`,
+                        borderRadius: '9px',
+                        padding: '10px 4px 8px',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                        transform: isSelected ? 'scale(1.06)' : isHovered ? 'translateY(-2px)' : 'none',
+                        boxShadow: isSelected
+                          ? '0 0 16px rgba(250, 204, 21, 0.7), inset 0 0 8px rgba(250, 204, 21, 0.25)'
+                          : isHovered
+                          ? `0 4px 12px ${isAvail ? 'rgba(16, 185, 129, 0.35)' : isHold ? 'rgba(245, 158, 11, 0.35)' : 'rgba(0,0,0,0.5)'}`
+                          : 'none',
+                        outline: 'none',
+                        position: 'relative',
+                        zIndex: isSelected ? 3 : isHovered ? 2 : 1,
+                      }}
+                    >
+                      <div
                         style={{
-                          cursor: 'pointer',
-                          transition: 'opacity 0.2s ease, transform 0.2s ease',
-                          opacity: isMatch ? 1 : 0.18,
+                          fontSize: '0.84rem',
+                          fontWeight: 700,
+                          color: isSelected ? '#ffffff' : textColor,
+                          lineHeight: 1.1,
+                          letterSpacing: '0.02em',
                         }}
                       >
-                        {/* Outer Selection Halo / Ripple indicator when clicked */}
-                        {isSelected && (
-                          <rect
-                            x={coords.x - 7}
-                            y={coords.y - 7}
-                            width={coords.w + 14}
-                            height={coords.h + 14}
-                            rx={14}
-                            fill="none"
-                            stroke="#facc15"
-                            strokeWidth={3.5}
-                            opacity={0.85}
-                            strokeDasharray="12 6"
-                          />
-                        )}
-
-                        {/* Highlight Rectangle */}
-                        <rect
-                          x={coords.x}
-                          y={coords.y}
-                          width={coords.w}
-                          height={coords.h}
-                          rx={8}
-                          fill={isSelected ? 'rgba(234, 179, 8, 0.55)' : isHovered ? 'rgba(250, 204, 21, 0.35)' : getFillColor(plot.status, false)}
-                          stroke={boundStroke}
-                          strokeWidth={boundStrokeWidth}
-                          style={{
-                            transition: 'all 0.18s ease-out',
-                            filter: boundFilter,
-                          }}
-                        />
-
-                        {/* Centered Plot Number High-Contrast Badge */}
-                        <rect
-                          x={badgeX}
-                          y={badgeY}
-                          width={badgeW}
-                          height={badgeH}
-                          rx={12}
-                          fill={badgeFill}
-                          stroke={badgeStroke}
-                          strokeWidth={badgeStrokeWidth}
-                          filter="url(#badge-shadow-lg)"
-                          style={{
-                            transition: 'all 0.18s ease-out',
-                          }}
-                        />
-
-                        {/* High-Visibility Bold Plot Number Text */}
-                        <text
-                          x={cx}
-                          y={cy}
-                          dominantBaseline="central"
-                          textAnchor="middle"
-                          fill={textColor}
-                          fontSize={fontSize}
-                          fontWeight={isSelected || isHovered ? '900' : '800'}
-                          fontFamily="system-ui, -apple-system, sans-serif"
-                          letterSpacing="-0.02em"
-                          style={{
-                            pointerEvents: 'none',
-                            userSelect: 'none',
-                            transition: 'all 0.18s ease-out',
-                          }}
-                        >
-                          {plot.plotNumber}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-              </div>
-
-              {/* Mobile Drag Helper Hint */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '10px',
-                  left: '12px',
-                  background: 'rgba(6, 17, 24, 0.8)',
-                  backdropFilter: 'blur(4px)',
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  fontSize: '0.72rem',
-                  color: '#94a3b8',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  pointerEvents: 'none',
-                }}
-              >
-                <Info size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: '-1px' }} />
-                Click any plot to inspect · Zoom in to pan layout
+                        {pNumDisplay}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '0.67rem',
+                          color: isSelected ? '#fde047' : textColor,
+                          opacity: isSelected ? 1 : 0.85,
+                          marginTop: '3px',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {plot.sizeSqYd || 200} Yd
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Bottom Footer Details */}
             <div
               style={{
-                padding: '0.75rem 1.25rem',
+                padding: '0.85rem 1.25rem',
                 background: 'rgba(6, 17, 24, 0.96)',
                 borderTop: '1px solid rgba(255, 255, 255, 0.08)',
                 display: 'flex',
@@ -1120,7 +899,7 @@ export default function PlotInventoryViewer({
                       Allotment Value
                     </span>
                     <div style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--primary-dark)', fontFamily: 'var(--font-heading)' }}>
-                      Price on Request
+                      Starting at ₹26 Lakh
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
@@ -1402,7 +1181,7 @@ export default function PlotInventoryViewer({
                         <div>
                           <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Allotment Price</div>
                           <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>
-                            Price on Request
+                            From ₹26 Lakh
                           </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -1504,7 +1283,7 @@ export default function PlotInventoryViewer({
                         type="button"
                         onClick={() => {
                           setActiveTab('map');
-                          handleFocusPlot(plot);
+                          handleSelectPlot(plot);
                         }}
                         style={{
                           background: 'none',
@@ -1521,7 +1300,7 @@ export default function PlotInventoryViewer({
                           textDecoration: 'underline',
                         }}
                       >
-                        <Layers size={13} /> Locate on Master Plan
+                        <Layers size={13} /> Locate in Layout Board
                       </button>
                     </div>
                   </div>
