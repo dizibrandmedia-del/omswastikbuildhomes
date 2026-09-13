@@ -809,15 +809,27 @@ export default function GlobalLeadModals() {
               window.closeAllModals = function() {
                 var em = getEl('omswastik-enquiry-modal');
                 var vm = getEl('omswastik-visit-modal');
+                var emiM = getEl('omswastik-plot-emi-modal');
                 if (em) em.style.display = 'none';
                 if (vm) vm.style.display = 'none';
+                if (emiM) emiM.style.display = 'none';
+                var overlays = document.querySelectorAll('.omswastik-modal-overlay');
+                for (var i = 0; i < overlays.length; i++) {
+                  if (overlays[i].parentNode) overlays[i].parentNode.removeChild(overlays[i]);
+                }
                 document.body.style.overflow = '';
               };
 
               window.openEnquiryModal = function(triggerEl) {
-                // Ensure visit modal and any other modal is completely hidden
+                // Ensure visit modal, emi modal, and any other modal is completely hidden
                 var vm = getEl('omswastik-visit-modal');
                 if (vm) vm.style.display = 'none';
+                var emiM = getEl('omswastik-plot-emi-modal');
+                if (emiM) emiM.style.display = 'none';
+                var overlays = document.querySelectorAll('.omswastik-modal-overlay');
+                for (var i = 0; i < overlays.length; i++) {
+                  if (overlays[i].parentNode) overlays[i].parentNode.removeChild(overlays[i]);
+                }
 
                 var modal = getEl('omswastik-enquiry-modal');
                 if (!modal) return;
@@ -888,9 +900,15 @@ export default function GlobalLeadModals() {
               };
 
               window.openVisitModal = function(triggerEl) {
-                // Ensure enquiry modal is completely hidden
+                // Ensure enquiry modal, emi modal, and any other modal is completely hidden
                 var em = getEl('omswastik-enquiry-modal');
                 if (em) em.style.display = 'none';
+                var emiM = getEl('omswastik-plot-emi-modal');
+                if (emiM) emiM.style.display = 'none';
+                var overlays = document.querySelectorAll('.omswastik-modal-overlay');
+                for (var i = 0; i < overlays.length; i++) {
+                  if (overlays[i].parentNode) overlays[i].parentNode.removeChild(overlays[i]);
+                }
 
                 var modal = getEl('omswastik-visit-modal');
                 if (!modal) return;
