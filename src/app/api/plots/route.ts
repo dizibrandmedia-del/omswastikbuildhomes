@@ -2,29 +2,41 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, hasPermission } from '@/lib/auth';
 
+import initialPlotsRaw from '@/lib/initialPlots.json';
+
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const projectId = searchParams.get('projectId');
-  const status = searchParams.get('status');
+  try {
+    const { searchParams } = new URL(req.url);
+    const projectId = searchParams.get('projectId');
+    const status = searchParams.get('status');
 
-  const whereClause: any = {};
-  if (projectId && projectId !== 'ALL') whereClause.projectId = projectId;
-  if (status && status !== 'ALL') whereClause.status = status;
+    const whereClause: any = {};
+    if (projectId && projectId !== 'ALL') whereClause.projectId = projectId;
+    if (status && status !== 'ALL') whereClause.status = status;
 
-  const rawPlots = await prisma.plot.findMany({
-    where: whereClause,
-    include: {
-      project: { select: { id: true, name: true, location: true } },
-    },
-  });
+    const rawPlots = await prisma.plot.findMany({
+      where: whereClause,
+      include: {
+        project: { select: { id: true, name: true, location: true } },
+      },
+    });
 
-  const plots = rawPlots.sort((a, b) => {
-    const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
-    const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
-    return numA - numB;
-  });
+    const plots = rawPlots.sort((a, b) => {
+      const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
 
-  return NextResponse.json({ plots });
+    return NextResponse.json({ plots });
+  } catch (err: any) {
+    console.warn('/api/plots DB error, returning fallback initialPlots:', err);
+    const plots = (initialPlotsRaw as any[]).sort((a, b) => {
+      const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+    return NextResponse.json({ plots, fallback: true });
+  }
 }
 
 export async function POST(req: NextRequest) {
