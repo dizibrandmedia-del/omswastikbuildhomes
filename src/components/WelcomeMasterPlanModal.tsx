@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   Download,
   User,
@@ -17,9 +18,15 @@ import {
 } from 'lucide-react';
 
 export default function WelcomeMasterPlanModal() {
+  const pathname = usePathname();
+  const isAdmin = Boolean(
+    pathname?.startsWith('/admin') ||
+    (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'))
+  );
+
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'WELCOME' | 'FORM' | 'SUCCESS'>('WELCOME');
-  const [downloadType, setDownloadType] = useState<'MASTER_PLAN' | 'BROCHURE'>('MASTER_PLAN');
+  const [downloadType, setDownloadType] = useState<'MASTER_PLAN' | 'BROCHURE'>('BROCHURE');
   const [leadSource, setLeadSource] = useState('WELCOME_POPUP');
   const [formData, setFormData] = useState({
     name: '',
@@ -30,8 +37,13 @@ export default function WelcomeMasterPlanModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Auto-trigger modal on initial website visit and URL page refresh (not on internal page switching)
+  // Auto-trigger modal on initial website visit and URL page refresh (NOT on admin panel)
   useEffect(() => {
+    // STRICT CHECK: Never trigger or show on any admin panel route
+    if (isAdmin || (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'))) {
+      return;
+    }
+
     let isReload = false;
     try {
       const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
@@ -50,18 +62,26 @@ export default function WelcomeMasterPlanModal() {
         sessionStorage.setItem('omswastik_session_seen', 'true');
       }
       const timer = setTimeout(() => {
-        setDownloadType('MASTER_PLAN');
+        // Double check admin route before opening
+        if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+          return;
+        }
+        setDownloadType('BROCHURE');
         setLeadSource(isReload ? 'PAGE_REFRESH' : 'FIRST_VISIT');
         setStep('WELCOME');
         setIsOpen(true);
       }, 700);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [pathname, isAdmin]);
 
   // Listen for manual trigger anywhere on website (e.g. buttons or data-action)
   useEffect(() => {
-    const handleOpenModal = (source = 'HERO_DOWNLOAD_BUTTON', type: 'MASTER_PLAN' | 'BROCHURE' = 'MASTER_PLAN') => {
+    const handleOpenModal = (source = 'HERO_DOWNLOAD_BUTTON', type: 'MASTER_PLAN' | 'BROCHURE' = 'BROCHURE') => {
+      // Don't open if on admin panel
+      if (isAdmin || (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'))) {
+        return;
+      }
       setDownloadType(type);
       setLeadSource(source);
       setStep('FORM');
@@ -105,7 +125,7 @@ export default function WelcomeMasterPlanModal() {
       window.removeEventListener('omswastik:download-brochure', handleCustomBrochureEvent);
       document.removeEventListener('click', handleGlobalClick);
     };
-  }, []);
+  }, [isAdmin]);
 
   const handleClose = () => {
     setIsOpen(false);
@@ -172,6 +192,7 @@ export default function WelcomeMasterPlanModal() {
           source: finalSource,
           projectId: 'riddhi',
           honeypot: formData.honeypot,
+          purpose: downloadType === 'BROCHURE' ? 'brochure' : 'master_plan',
         }),
       });
 
@@ -197,7 +218,7 @@ export default function WelcomeMasterPlanModal() {
     }
   };
 
-  if (!isOpen) return null;
+  if (isAdmin || !isOpen) return null;
 
   return (
     <div
@@ -317,10 +338,10 @@ export default function WelcomeMasterPlanModal() {
           </div>
         </div>
 
-        {/* STEP 1: WELCOME & MASTER PLAN DOWNLOAD PROMPT */}
+        {/* STEP 1: WELCOME & BROCHURE / MASTER PLAN DOWNLOAD PROMPT */}
         {step === 'WELCOME' && (
           <div style={{ padding: '1.5rem 1.5rem 1.25rem' }}>
-            {/* Master Plan Visual Preview Box */}
+            {/* Visual Preview Box */}
             <div
               style={{
                 background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
@@ -347,7 +368,7 @@ export default function WelcomeMasterPlanModal() {
                   textTransform: 'uppercase',
                 }}
               >
-                Official PDF Available
+                {downloadType === 'BROCHURE' ? 'Official Brochure Available' : 'Official PDF Available'}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
@@ -368,10 +389,12 @@ export default function WelcomeMasterPlanModal() {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.98rem', color: 'var(--primary-dark)' }}>
-                    Complete 69-Unit Master Plan
+                    {downloadType === 'BROCHURE' ? 'Official Project Brochure (PDF)' : 'Complete 69-Unit Master Plan'}
                   </div>
                   <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-                    Standard Typology: 25′ × 72′ · 200 Sq. Yds. (1,800 Sq. Ft.)
+                    {downloadType === 'BROCHURE'
+                      ? 'Master Plan, Plot Typologies & Investment Blueprint'
+                      : 'Standard Typology: 25′ × 72′ · 200 Sq. Yds. (1,800 Sq. Ft.)'}
                   </div>
                 </div>
               </div>
@@ -395,7 +418,9 @@ export default function WelcomeMasterPlanModal() {
 
             {/* Prompt Text */}
             <p style={{ fontSize: '0.88rem', color: '#475569', lineHeight: 1.5, marginBottom: '1.25rem', textAlign: 'center' }}>
-              Would you like to download the verified high-resolution master plan layout for your investment review?
+              {downloadType === 'BROCHURE'
+                ? 'Would you like to download the official project brochure for complete layout and investment details?'
+                : 'Would you like to download the verified high-resolution master plan layout for your investment review?'}
             </p>
 
             {/* CTAs */}
@@ -417,7 +442,10 @@ export default function WelcomeMasterPlanModal() {
                   boxShadow: 'var(--shadow-gold)',
                 }}
               >
-                <Download size={18} /> Download Official Master Plan (PDF)
+                <Download size={18} />{' '}
+                {downloadType === 'BROCHURE'
+                  ? 'Download Official Brochure (PDF)'
+                  : 'Download Official Master Plan (PDF)'}
               </button>
 
               <button

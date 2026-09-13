@@ -26,6 +26,7 @@ public_html_ready/
 realtime_update_staging/
 login.html
 public/videos/
+public/brochure.pdf
 *.zip
 *.log
 *.tsbuildinfo
