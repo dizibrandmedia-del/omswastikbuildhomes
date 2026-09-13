@@ -274,6 +274,104 @@ export default function PlotInventoryViewer({
     }
   };
 
+  const renderSchematicPlot = (plotNum: number, orientation: 'vertical' | 'horizontal' = 'vertical') => {
+    const plot = plots.find((p) => String(p.plotNumber) === String(plotNum));
+    if (!plot) return null;
+
+    const isSelected = selectedPlot?.plotNumber === String(plotNum);
+    const isHovered = hoveredPlotNumber === String(plotNum);
+    const isMatch = filteredPlotNumbers.has(String(plotNum));
+    const isHold = plot.status === 'HOLD';
+    const isBooked = plot.status === 'BOOKED' || plot.status === 'SOLD';
+
+    // Warm cream-yellow background matching the user reference drawing
+    let bg = '#fff9c4'; // Soft warm yellow
+    let border = '#1e293b'; // Solid dark crisp architectural border
+    let text = '#0f172a'; // Bold dark number
+    let statusDot = '#10b981'; // Green dot for available
+
+    if (isHold) {
+      bg = '#fed7aa'; // Amber tint
+      border = '#c2410c';
+      statusDot = '#f59e0b';
+    } else if (isBooked) {
+      bg = '#cbd5e1'; // Muted slate grey
+      border = '#64748b';
+      text = '#475569';
+      statusDot = '#64748b';
+    }
+
+    if (isSelected) {
+      border = '#eab308';
+      bg = '#fef08a'; // Bright gold highlight
+    }
+
+    const isVert = orientation === 'vertical';
+
+    return (
+      <button
+        key={plotNum}
+        type="button"
+        id={`plot-unit-btn-${plotNum}`}
+        data-plot-number={plotNum}
+        onClick={() => handleSelectPlot(plot)}
+        onMouseEnter={() => setHoveredPlotNumber(String(plotNum))}
+        onMouseLeave={() => setHoveredPlotNumber(null)}
+        title={`Plot #${plotNum} · ${plot.status} · 200 Sq. Yd. (${plot.facing} Facing)`}
+        style={{
+          width: isVert ? '48px' : '62px',
+          height: isVert ? '68px' : '44px',
+          background: bg,
+          border: isSelected ? '2.5px solid #eab308' : `1.5px solid ${border}`,
+          borderRadius: '3px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          position: 'relative',
+          transition: 'all 0.15s ease',
+          transform: isSelected ? 'scale(1.08)' : isHovered ? 'scale(1.04)' : 'none',
+          boxShadow: isSelected
+            ? '0 0 16px rgba(250, 204, 21, 0.9), inset 0 0 6px rgba(250, 204, 21, 0.35)'
+            : isHovered
+            ? '0 4px 10px rgba(0, 0, 0, 0.35)'
+            : 'none',
+          opacity: isMatch ? 1 : 0.2,
+          zIndex: isSelected ? 5 : isHovered ? 4 : 1,
+          padding: 0,
+          outline: 'none',
+          flexShrink: 0,
+          boxSizing: 'border-box',
+        }}
+      >
+        <span
+          style={{
+            fontSize: '1.05rem',
+            fontWeight: 800,
+            color: text,
+            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {plotNum}
+        </span>
+        <span
+          style={{
+            position: 'absolute',
+            bottom: '3px',
+            right: '3px',
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: statusDot,
+          }}
+        />
+      </button>
+    );
+  };
+
   return (
     <div id="plot-inventory-root" style={{ width: '100%' }}>
       {/* 1. Inventory Header & KPI Counter Strip */}
@@ -646,105 +744,335 @@ export default function PlotInventoryViewer({
               </div>
             </div>
 
-            {/* The Plot Grid (P-01 to P-69 in clean responsive pills) */}
+            {/* The Schematic Site Plan Board (Exact Match to User Reference Diagram) */}
             <div
               style={{
-                padding: '1.5rem',
-                maxHeight: '620px',
+                padding: '2rem 1.25rem',
+                overflowX: 'auto',
                 overflowY: 'auto',
+                maxHeight: '680px',
                 boxSizing: 'border-box',
+                background: 'linear-gradient(180deg, #021118 0%, #031821 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
               <div
                 style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
-                  gap: '9px',
-                  width: '100%',
+                  minWidth: '980px',
+                  maxWidth: '1080px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  boxSizing: 'border-box',
+                  padding: '1.25rem',
+                  borderRadius: '12px',
+                  background: 'rgba(2, 20, 28, 0.85)',
+                  border: '1px solid rgba(228, 170, 60, 0.25)',
+                  boxShadow: 'inset 0 0 40px rgba(0, 0, 0, 0.5)',
                 }}
               >
-                {filteredPlots.map((plot) => {
-                  const isSelected = selectedPlot?.plotNumber === plot.plotNumber;
-                  const isHovered = hoveredPlotNumber === plot.plotNumber;
-                  const isAvail = plot.status === 'AVAILABLE';
-                  const isHold = plot.status === 'HOLD';
-                  const isBooked = plot.status === 'BOOKED' || plot.status === 'SOLD';
+                {/* 1. TOP TIER (Horizontal Rows: 27-35 & 36-43) */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  {/* Top-Left Block: Plots 27 to 35 (9 plots) */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '2px',
+                      background: '#0f172a',
+                      padding: '2px',
+                      borderRadius: '5px',
+                      border: '1.5px solid #334155',
+                    }}
+                  >
+                    {[27, 28, 29, 30, 31, 32, 33, 34, 35].map((num) => renderSchematicPlot(num, 'vertical'))}
+                  </div>
 
-                  // Exact colors matching reference image 2
-                  let borderColor = '#10b981';
-                  let bgColor = '#032629';
-                  let textColor = '#34d399';
+                  {/* Central Spine Top Gap */}
+                  <div
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingInline: '1rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      North Sector Road
+                    </span>
+                  </div>
 
-                  if (isHold) {
-                    borderColor = '#f59e0b';
-                    bgColor = '#271b05';
-                    textColor = '#fbbf24';
-                  } else if (isBooked) {
-                    borderColor = '#334155';
-                    bgColor = '#0f172a';
-                    textColor = '#64748b';
-                  }
+                  {/* Top-Right Block: Plots 36 to 43 (8 plots) */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '2px',
+                      background: '#0f172a',
+                      padding: '2px',
+                      borderRadius: '5px',
+                      border: '1.5px solid #334155',
+                    }}
+                  >
+                    {[36, 37, 38, 39, 40, 41, 42, 43].map((num) => renderSchematicPlot(num, 'vertical'))}
+                  </div>
+                </div>
 
-                  if (isSelected) {
-                    borderColor = '#facc15';
-                    bgColor = isAvail ? '#04353a' : isHold ? '#3a2707' : '#1e293b';
-                  }
+                {/* Horizontal Road Corridor (Between Top Row & Middle Section) */}
+                <div
+                  style={{
+                    height: '32px',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    borderRadius: '6px',
+                    border: '1px dashed rgba(148, 163, 184, 0.25)',
+                    position: 'relative',
+                  }}
+                >
+                  <span style={{ fontSize: '0.72rem', color: 'var(--gold-light)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    ← 9.00 Metre Wide Internal Sector Road →
+                  </span>
+                </div>
 
-                  const pNumDisplay = `P-${String(plot.plotNumber).padStart(2, '0')}`;
-
-                  return (
-                    <button
-                      key={plot.id || plot.plotNumber}
-                      type="button"
-                      id={`plot-unit-btn-${plot.plotNumber}`}
-                      onClick={() => handleSelectPlot(plot)}
-                      onMouseEnter={() => setHoveredPlotNumber(plot.plotNumber)}
-                      onMouseLeave={() => setHoveredPlotNumber(null)}
-                      title={`Plot #${plot.plotNumber} · ${plot.status} · 200 Sq. Yd. (${plot.facing} Facing)`}
+                {/* 2. MIDDLE TIER (4 Vertical 2-Column Blocks) */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    paddingBlock: '4px',
+                  }}
+                >
+                  {/* Left Half (Block 1 & Block 2) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '38px' }}>
+                    {/* Middle Block 1: 14-11 (left col), 15-18 (right col) */}
+                    <div
                       style={{
-                        background: bgColor,
-                        border: isSelected ? '2px solid #facc15' : `1.5px solid ${borderColor}`,
-                        borderRadius: '9px',
-                        padding: '10px 4px 8px',
-                        textAlign: 'center',
-                        cursor: 'pointer',
-                        transition: 'all 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
-                        transform: isSelected ? 'scale(1.06)' : isHovered ? 'translateY(-2px)' : 'none',
-                        boxShadow: isSelected
-                          ? '0 0 16px rgba(250, 204, 21, 0.7), inset 0 0 8px rgba(250, 204, 21, 0.25)'
-                          : isHovered
-                          ? `0 4px 12px ${isAvail ? 'rgba(16, 185, 129, 0.35)' : isHold ? 'rgba(245, 158, 11, 0.35)' : 'rgba(0,0,0,0.5)'}`
-                          : 'none',
-                        outline: 'none',
-                        position: 'relative',
-                        zIndex: isSelected ? 3 : isHovered ? 2 : 1,
+                        display: 'grid',
+                        gridTemplateColumns: 'auto auto',
+                        gap: '2px',
+                        background: '#0f172a',
+                        padding: '2px',
+                        borderRadius: '5px',
+                        border: '1.5px solid #334155',
                       }}
                     >
-                      <div
-                        style={{
-                          fontSize: '0.84rem',
-                          fontWeight: 700,
-                          color: isSelected ? '#ffffff' : textColor,
-                          lineHeight: 1.1,
-                          letterSpacing: '0.02em',
-                        }}
-                      >
-                        {pNumDisplay}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: '0.67rem',
-                          color: isSelected ? '#fde047' : textColor,
-                          opacity: isSelected ? 1 : 0.85,
-                          marginTop: '3px',
-                          fontWeight: 500,
-                        }}
-                      >
-                        {plot.sizeSqYd || 200} Yd
-                      </div>
-                    </button>
-                  );
-                })}
+                      {/* Row 1: 14, 15 */}
+                      {renderSchematicPlot(14, 'horizontal')}
+                      {renderSchematicPlot(15, 'horizontal')}
+                      {/* Row 2: 13, 16 */}
+                      {renderSchematicPlot(13, 'horizontal')}
+                      {renderSchematicPlot(16, 'horizontal')}
+                      {/* Row 3: 12, 17 */}
+                      {renderSchematicPlot(12, 'horizontal')}
+                      {renderSchematicPlot(17, 'horizontal')}
+                      {/* Row 4: 11, 18 */}
+                      {renderSchematicPlot(11, 'horizontal')}
+                      {renderSchematicPlot(18, 'horizontal')}
+                    </div>
+
+                    {/* Middle Block 2: 22-19 (left col), 23-26 (right col) */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto auto',
+                        gap: '2px',
+                        background: '#0f172a',
+                        padding: '2px',
+                        borderRadius: '5px',
+                        border: '1.5px solid #334155',
+                      }}
+                    >
+                      {/* Row 1: 22, 23 */}
+                      {renderSchematicPlot(22, 'horizontal')}
+                      {renderSchematicPlot(23, 'horizontal')}
+                      {/* Row 2: 21, 24 */}
+                      {renderSchematicPlot(21, 'horizontal')}
+                      {renderSchematicPlot(24, 'horizontal')}
+                      {/* Row 3: 20, 25 */}
+                      {renderSchematicPlot(20, 'horizontal')}
+                      {renderSchematicPlot(25, 'horizontal')}
+                      {/* Row 4: 19, 26 */}
+                      {renderSchematicPlot(19, 'horizontal')}
+                      {renderSchematicPlot(26, 'horizontal')}
+                    </div>
+                  </div>
+
+                  {/* Central Spine Avenue (Aligned with Top/Bottom Central Opening) */}
+                  <div
+                    style={{
+                      height: '188px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingInline: '1rem',
+                      borderLeft: '1px dashed rgba(228, 170, 60, 0.3)',
+                      borderRight: '1px dashed rgba(228, 170, 60, 0.3)',
+                      background: 'rgba(228, 170, 60, 0.03)',
+                      borderRadius: '6px',
+                    }}
+                  >
+                    <span
+                      style={{
+                        writingMode: 'vertical-rl',
+                        textOrientation: 'mixed',
+                        transform: 'rotate(180deg)',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        color: 'var(--gold)',
+                        letterSpacing: '0.15em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Central Spine Boulevard
+                    </span>
+                  </div>
+
+                  {/* Right Half (Block 3 & Block 4) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '38px' }}>
+                    {/* Middle Block 3: 56-59 (left col), 55-52 (right col) */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto auto',
+                        gap: '2px',
+                        background: '#0f172a',
+                        padding: '2px',
+                        borderRadius: '5px',
+                        border: '1.5px solid #334155',
+                      }}
+                    >
+                      {/* Row 1: 56, 55 */}
+                      {renderSchematicPlot(56, 'horizontal')}
+                      {renderSchematicPlot(55, 'horizontal')}
+                      {/* Row 2: 57, 54 */}
+                      {renderSchematicPlot(57, 'horizontal')}
+                      {renderSchematicPlot(54, 'horizontal')}
+                      {/* Row 3: 58, 53 */}
+                      {renderSchematicPlot(58, 'horizontal')}
+                      {renderSchematicPlot(53, 'horizontal')}
+                      {/* Row 4: 59, 52 */}
+                      {renderSchematicPlot(59, 'horizontal')}
+                      {renderSchematicPlot(52, 'horizontal')}
+                    </div>
+
+                    {/* Middle Block 4: 51-48 (left col), 44-47 (right col) */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto auto',
+                        gap: '2px',
+                        background: '#0f172a',
+                        padding: '2px',
+                        borderRadius: '5px',
+                        border: '1.5px solid #334155',
+                      }}
+                    >
+                      {/* Row 1: 51, 44 */}
+                      {renderSchematicPlot(51, 'horizontal')}
+                      {renderSchematicPlot(44, 'horizontal')}
+                      {/* Row 2: 50, 45 */}
+                      {renderSchematicPlot(50, 'horizontal')}
+                      {renderSchematicPlot(45, 'horizontal')}
+                      {/* Row 3: 49, 46 */}
+                      {renderSchematicPlot(49, 'horizontal')}
+                      {renderSchematicPlot(46, 'horizontal')}
+                      {/* Row 4: 48, 47 */}
+                      {renderSchematicPlot(48, 'horizontal')}
+                      {renderSchematicPlot(47, 'horizontal')}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Horizontal Road Corridor (Between Middle Section & Bottom Row) */}
+                <div
+                  style={{
+                    height: '32px',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    borderRadius: '6px',
+                    border: '1px dashed rgba(148, 163, 184, 0.25)',
+                    position: 'relative',
+                  }}
+                >
+                  <span style={{ fontSize: '0.72rem', color: 'var(--gold-light)', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                    ← 9.00 Metre Wide Internal Sector Road →
+                  </span>
+                </div>
+
+                {/* 3. BOTTOM TIER (Horizontal Rows: 10-1 & 69-60) */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  {/* Bottom-Left Block: Plots 10 down to 1 (10 plots) */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '2px',
+                      background: '#0f172a',
+                      padding: '2px',
+                      borderRadius: '5px',
+                      border: '1.5px solid #334155',
+                    }}
+                  >
+                    {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((num) => renderSchematicPlot(num, 'vertical'))}
+                  </div>
+
+                  {/* Central Spine Bottom Gap */}
+                  <div
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      paddingInline: '1rem',
+                    }}
+                  >
+                    <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                      Boulevard Access
+                    </span>
+                  </div>
+
+                  {/* Bottom-Right Block: Plots 69 down to 60 (10 plots) */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '2px',
+                      background: '#0f172a',
+                      padding: '2px',
+                      borderRadius: '5px',
+                      border: '1.5px solid #334155',
+                    }}
+                  >
+                    {[69, 68, 67, 66, 65, 64, 63, 62, 61, 60].map((num) => renderSchematicPlot(num, 'vertical'))}
+                  </div>
+                </div>
+
+                {/* Bottom Main Arterial Road (In front of Plots 10-1 & 69-60) */}
+                <div
+                  style={{
+                    height: '40px',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'linear-gradient(90deg, rgba(0, 70, 74, 0.45) 0%, rgba(202, 138, 4, 0.45) 100%)',
+                    borderRadius: '8px',
+                    border: '1.5px solid rgba(228, 170, 60, 0.4)',
+                    marginTop: '4px',
+                  }}
+                >
+                  <span style={{ fontSize: '0.78rem', color: '#ffffff', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase' }}>
+                    🛣️ 18.00 Metre Main Arterial Sector Road (Expressway Facing)
+                  </span>
+                </div>
               </div>
             </div>
 
