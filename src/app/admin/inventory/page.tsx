@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { formatCurrency, getPlotStatusBadgeClass } from '@/lib/utils';
-import { Grid, Plus, Download, Edit2, AlertTriangle, Check, Loader2, Search, Filter, X } from 'lucide-react';
+import { Grid, Plus, Download, Edit2, AlertTriangle, Check, Loader2, Search, Filter, X, RefreshCw } from 'lucide-react';
 import initialPlots from '@/lib/initialPlots.json';
 
 export default function AdminInventoryPage() {
   const [plots, setPlots] = useState<any[]>(initialPlots);
   const [loading, setLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
@@ -34,9 +35,14 @@ export default function AdminInventoryPage() {
     remarks: '',
   });
 
-  const fetchPlots = async () => {
+  const fetchPlots = async (silent = false) => {
     try {
-      const res = await fetch(`/api/plots?status=${statusFilter}`);
+      if (!silent) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+      const res = await fetch(`/api/plots?status=${statusFilter}&t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         if (data.plots && Array.isArray(data.plots) && data.plots.length > 0) {
@@ -47,11 +53,18 @@ export default function AdminInventoryPage() {
       console.error('Fetch plots error:', err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchPlots();
+
+    const interval = setInterval(() => {
+      fetchPlots(true);
+    }, 12000);
+
+    return () => clearInterval(interval);
   }, [statusFilter]);
 
   const openStatusModal = (plot: any, newStatus: string) => {
@@ -157,7 +170,18 @@ export default function AdminInventoryPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={() => fetchPlots(false)}
+            disabled={loading || isRefreshing}
+            className="btn-outline-gold"
+            style={{ fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.55rem 0.95rem' }}
+            title="Sync Latest Plot Data"
+          >
+            <RefreshCw size={15} className={isRefreshing || loading ? 'animate-spin' : ''} />
+            {isRefreshing ? 'Syncing...' : 'Sync Now'}
+          </button>
           <a
             href="/api/reports?format=csv&type=inventory"
             download

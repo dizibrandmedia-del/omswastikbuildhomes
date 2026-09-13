@@ -815,6 +815,10 @@ export default function GlobalLeadModals() {
               };
 
               window.openEnquiryModal = function(triggerEl) {
+                // Ensure visit modal and any other modal is completely hidden
+                var vm = getEl('omswastik-visit-modal');
+                if (vm) vm.style.display = 'none';
+
                 var modal = getEl('omswastik-enquiry-modal');
                 if (!modal) return;
 
@@ -884,6 +888,10 @@ export default function GlobalLeadModals() {
               };
 
               window.openVisitModal = function(triggerEl) {
+                // Ensure enquiry modal is completely hidden
+                var em = getEl('omswastik-enquiry-modal');
+                if (em) em.style.display = 'none';
+
                 var modal = getEl('omswastik-visit-modal');
                 if (!modal) return;
 
@@ -957,11 +965,15 @@ export default function GlobalLeadModals() {
               };
 
               function bindModalDelegation() {
+                if (window.__osb_modal_delegation_bound) return;
+                window.__osb_modal_delegation_bound = true;
+
                 // Click delegation
                 document.addEventListener('click', function(e) {
                   var openEnquiryTrigger = e.target.closest('[data-action="open-enquiry"]');
                   if (openEnquiryTrigger) {
                     e.preventDefault();
+                    e.stopPropagation();
                     window.openEnquiryModal(openEnquiryTrigger);
                     return;
                   }
@@ -969,6 +981,7 @@ export default function GlobalLeadModals() {
                   var openVisitTrigger = e.target.closest('[data-action="open-visit"]') || e.target.closest('[data-action="open-sitevisit"]') || e.target.closest('#hero-book-sitevisit-btn');
                   if (openVisitTrigger) {
                     e.preventDefault();
+                    e.stopPropagation();
                     window.openVisitModal(openVisitTrigger);
                     return;
                   }
@@ -976,6 +989,7 @@ export default function GlobalLeadModals() {
                   var closeTrigger = e.target.closest('[data-action="close-modal"]');
                   if (closeTrigger) {
                     e.preventDefault();
+                    e.stopPropagation();
                     window.closeAllModals();
                     return;
                   }

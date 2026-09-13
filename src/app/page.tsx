@@ -268,7 +268,7 @@ export default async function HomePage() {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', padding: '0.4rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(228, 170, 60, 0.4)', color: '#ffffff', fontSize: '0.85rem' }}>
                 <CheckCircle2 size={15} style={{ color: 'var(--gold)' }} />
-                <span>Plots from ₹11.25 Lakh</span>
+                <span>Plots from ₹26 Lakh</span>
               </div>
             </div>
 
@@ -1331,7 +1331,7 @@ export default async function HomePage() {
                   Early Investor Opportunity
                 </div>
                 <div style={{ fontSize: '1.15rem', fontWeight: 700, marginTop: '0.25rem' }}>
-                  Plots from ₹11.25 Lakh
+                  Plots from ₹26 Lakh
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#cbd5e1', marginTop: '0.2rem' }}>
                   Booking Token: ₹51,000 only

@@ -250,7 +250,7 @@ export default function DholeraLocationPage() {
             Secure Your Plotted Asset in Dholera SIR
           </h2>
           <p style={{ color: '#cbd5e1', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '2rem' }}>
-            Demarcated clear-title plots available starting at ₹11.25 Lakh. Direct site visit pickup arranged from Ahmedabad.
+            Demarcated clear-title plots available starting at ₹26 Lakh. Direct site visit pickup arranged from Ahmedabad.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/plots" className="btn-primary" style={{ padding: '1rem 2.25rem', fontSize: '1rem' }}>

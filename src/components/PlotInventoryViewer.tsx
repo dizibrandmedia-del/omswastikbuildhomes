@@ -20,7 +20,8 @@ import {
   LayoutGrid,
   Info,
   ExternalLink,
-  PhoneCall
+  PhoneCall,
+  X
 } from 'lucide-react';
 import initialPlotsRaw from '@/lib/initialPlots.json';
 
@@ -104,6 +105,12 @@ export default function PlotInventoryViewer({
   const [onlyParks, setOnlyParks] = useState<boolean>(false);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [hoveredPlotNumber, setHoveredPlotNumber] = useState<string | null>(null);
+
+  // Interactive EMI Calculator Modal State
+  const [emiPlot, setEmiPlot] = useState<PlotData | null>(null);
+  const [emiLoanAmount, setEmiLoanAmount] = useState<number>(2000000);
+  const [emiRate, setEmiRate] = useState<number>(8.5);
+  const [emiTenureYears, setEmiTenureYears] = useState<number>(15);
 
   // Pan & Zoom state for interactive Master Plan
   const [zoom, setZoom] = useState<number>(1);
@@ -256,8 +263,24 @@ export default function PlotInventoryViewer({
     }
   };
 
-  // Smooth scroll to EMI calculator & prefill
-  const handleScrollToCalculator = (plot: PlotData) => {
+  // Interactive EMI calculations
+  const emiMonthlyRate = (emiRate / 12) / 100;
+  const emiTenureMonths = emiTenureYears * 12;
+  const calculatedMonthlyEmi =
+    emiMonthlyRate > 0
+      ? Math.round((emiLoanAmount * emiMonthlyRate * Math.pow(1 + emiMonthlyRate, emiTenureMonths)) /
+        (Math.pow(1 + emiMonthlyRate, emiTenureMonths) - 1))
+      : Math.round(emiLoanAmount / emiTenureMonths);
+  const calculatedTotalPayable = calculatedMonthlyEmi * emiTenureMonths;
+  const calculatedTotalInterest = Math.max(0, calculatedTotalPayable - emiLoanAmount);
+
+  // Open interactive EMI calculator modal & optionally sync with #calculator if on page
+  const handleOpenEmiModal = (plot: PlotData) => {
+    setEmiPlot(plot);
+    setEmiLoanAmount(2000000);
+    setEmiRate(8.5);
+    setEmiTenureYears(15);
+
     const calc = document.getElementById('calculator');
     if (calc) {
       calc.scrollIntoView({ behavior: 'smooth' });
@@ -275,6 +298,23 @@ export default function PlotInventoryViewer({
           },
         })
       );
+    }
+  };
+
+  const handleEnquireFromEmi = (plot: PlotData) => {
+    setEmiPlot(null);
+    if (typeof window !== 'undefined' && (window as any).openEnquiryModal) {
+      const dummy = document.createElement('div');
+      dummy.setAttribute('data-plot-number', plot.plotNumber);
+      dummy.setAttribute('data-plot-id', plot.id);
+      dummy.setAttribute('data-project-name', projectName);
+      (window as any).openEnquiryModal(dummy);
+      setTimeout(() => {
+        const msg = document.getElementById('enquiry-field-message') as HTMLTextAreaElement;
+        if (msg) {
+          msg.value = `Inquiring for Plot #${plot.plotNumber} with Loan requirement of ₹${(emiLoanAmount / 100000).toFixed(1)} Lakh at ${emiRate}% for ${emiTenureYears} Years (Est. EMI: ₹${calculatedMonthlyEmi.toLocaleString('en-IN')}/mo).`;
+        }
+      }, 100);
     }
   };
 
@@ -1102,6 +1142,12 @@ export default function PlotInventoryViewer({
                   data-plot-id={selectedPlot.id}
                   data-plot-number={selectedPlot.plotNumber}
                   data-project-name={projectName}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (typeof window !== 'undefined' && (window as any).openEnquiryModal) {
+                      (window as any).openEnquiryModal(e.currentTarget);
+                    }
+                  }}
                   className="btn-primary"
                   style={{
                     padding: '0.75rem 1rem',
@@ -1123,6 +1169,12 @@ export default function PlotInventoryViewer({
                   data-plot-id={selectedPlot.id}
                   data-plot-number={selectedPlot.plotNumber}
                   data-project-name={projectName}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (typeof window !== 'undefined' && (window as any).openVisitModal) {
+                      (window as any).openVisitModal(e.currentTarget);
+                    }
+                  }}
                   className="btn-outline-gold"
                   style={{
                     padding: '0.7rem 1rem',
@@ -1164,7 +1216,10 @@ export default function PlotInventoryViewer({
                 {/* 4. Calculate EMI Button (Scrolls & Connects with #calculator) */}
                 <button
                   type="button"
-                  onClick={() => handleScrollToCalculator(selectedPlot)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenEmiModal(selectedPlot);
+                  }}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -1366,6 +1421,12 @@ export default function PlotInventoryViewer({
                           data-plot-id={plot.id}
                           data-plot-number={plot.plotNumber}
                           data-project-name={projectName}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (typeof window !== 'undefined' && (window as any).openEnquiryModal) {
+                              (window as any).openEnquiryModal(e.currentTarget);
+                            }
+                          }}
                           className="btn-primary"
                           style={{ padding: '0.55rem 0.5rem', fontSize: '0.82rem', width: '100%' }}
                         >
@@ -1378,6 +1439,12 @@ export default function PlotInventoryViewer({
                           data-plot-id={plot.id}
                           data-plot-number={plot.plotNumber}
                           data-project-name={projectName}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (typeof window !== 'undefined' && (window as any).openVisitModal) {
+                              (window as any).openVisitModal(e.currentTarget);
+                            }
+                          }}
                           className="btn-outline-gold"
                           style={{ padding: '0.55rem 0.5rem', fontSize: '0.82rem', width: '100%' }}
                         >
@@ -1409,9 +1476,10 @@ export default function PlotInventoryViewer({
 
                         <button
                           type="button"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setSelectedPlot(plot);
-                            handleScrollToCalculator(plot);
+                            handleOpenEmiModal(plot);
                           }}
                           style={{
                             display: 'flex',
@@ -1463,6 +1531,248 @@ export default function PlotInventoryViewer({
           )}
         </div>
       </div>
+
+      {/* 5. INTERACTIVE PLOT EMI CALCULATOR MODAL */}
+      {emiPlot && (
+        <div
+          className="modal-overlay"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 32, 35, 0.75)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem',
+          }}
+          onClick={() => setEmiPlot(null)}
+        >
+          <div
+            className="modal-content"
+            style={{
+              position: 'relative',
+              maxWidth: '540px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              borderRadius: '20px',
+              padding: 0,
+              background: '#ffffff',
+              border: '1.5px solid rgba(228, 170, 60, 0.4)',
+              boxShadow: '0 25px 60px -12px rgba(0, 32, 35, 0.5)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, #00363a 0%, #001f22 100%)',
+                padding: '1.5rem 1.75rem',
+                borderBottom: '2px solid var(--gold)',
+                color: '#ffffff',
+                borderTopLeftRadius: '18px',
+                borderTopRightRadius: '18px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '0.75rem',
+                    color: 'var(--gold-light)',
+                    background: 'rgba(228, 170, 60, 0.15)',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '12px',
+                    fontWeight: 600,
+                    marginBottom: '0.4rem',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  <CalcIcon size={13} style={{ color: 'var(--gold)' }} />
+                  <span>Plot Financial Calculator</span>
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.4rem', color: '#ffffff' }}>
+                  Plot #{emiPlot.plotNumber} · EMI Estimator
+                </h3>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem', color: '#94a3b8' }}>
+                  200 Sq. Yd. (25′ × 72′) · {emiPlot.facing} Facing · Plots from ₹26 Lakh
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEmiPlot(null)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.5rem 1.75rem' }}>
+              {/* Monthly EMI Result Highlight */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0, 70, 74, 0.08) 0%, rgba(228, 170, 60, 0.12) 100%)',
+                  border: '1.5px solid var(--gold)',
+                  borderRadius: '14px',
+                  padding: '1.25rem',
+                  textAlign: 'center',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <div style={{ fontSize: '0.8rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Estimated Monthly EMI
+                </div>
+                <div style={{ fontSize: '2.4rem', fontWeight: 800, color: 'var(--primary-dark)', margin: '0.25rem 0' }}>
+                  ₹{calculatedMonthlyEmi.toLocaleString('en-IN')}
+                  <span style={{ fontSize: '1rem', fontWeight: 500, color: '#64748b' }}> / month*</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', fontSize: '0.78rem', color: '#64748b', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                  <span>Total Loan: <strong style={{ color: 'var(--dark)' }}>₹{(emiLoanAmount / 100000).toFixed(1)} Lakh</strong></span>
+                  <span>Total Interest: <strong style={{ color: 'var(--dark)' }}>₹{(calculatedTotalInterest / 100000).toFixed(2)} Lakh</strong></span>
+                  <span>Payable: <strong style={{ color: 'var(--dark)' }}>₹{(calculatedTotalPayable / 100000).toFixed(2)} Lakh</strong></span>
+                </div>
+              </div>
+
+              {/* Slider 1: Loan Amount */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary-dark)' }}>
+                    Loan Amount
+                  </label>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary)' }}>
+                    ₹{(emiLoanAmount / 100000).toFixed(2)} Lakhs
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={500000}
+                  max={4000000}
+                  step={50000}
+                  value={emiLoanAmount}
+                  onChange={(e) => setEmiLoanAmount(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                  <span>₹5 Lakh</span>
+                  <span>₹20 Lakh (75%)</span>
+                  <span>₹40 Lakh</span>
+                </div>
+              </div>
+
+              {/* Slider 2: Interest Rate */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary-dark)' }}>
+                    Interest Rate (% p.a.)
+                  </label>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary)' }}>
+                    {emiRate}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={7.5}
+                  max={13}
+                  step={0.1}
+                  value={emiRate}
+                  onChange={(e) => setEmiRate(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                  <span>7.5%</span>
+                  <span>8.5% (Avg Bank Rate)</span>
+                  <span>13.0%</span>
+                </div>
+              </div>
+
+              {/* Slider 3: Loan Tenure */}
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary-dark)' }}>
+                    Loan Tenure (Years)
+                  </label>
+                  <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary)' }}>
+                    {emiTenureYears} Years ({emiTenureYears * 12} Months)
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={3}
+                  max={25}
+                  step={1}
+                  value={emiTenureYears}
+                  onChange={(e) => setEmiTenureYears(Number(e.target.value))}
+                  style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#94a3b8', marginTop: '2px' }}>
+                  <span>3 Yrs</span>
+                  <span>15 Yrs</span>
+                  <span>25 Yrs</span>
+                </div>
+              </div>
+
+              {/* Bank Partners Trust Banner */}
+              <div
+                style={{
+                  background: '#f8fafc',
+                  borderRadius: '8px',
+                  padding: '0.7rem 1rem',
+                  fontSize: '0.75rem',
+                  color: '#64748b',
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <CheckCircle2 size={15} style={{ color: '#10b981', flexShrink: 0 }} />
+                <span>
+                  Nationalized &amp; Private Bank Home/Plot Loan assistance available: <strong>SBI, HDFC, ICICI, Axis Bank</strong>.
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <button
+                  type="button"
+                  onClick={() => handleEnquireFromEmi(emiPlot)}
+                  className="btn-primary"
+                  style={{ flex: 1, padding: '0.85rem', fontSize: '0.92rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                >
+                  <Send size={15} /> Apply for this Loan Plan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEmiPlot(null)}
+                  className="btn-outline-gold"
+                  style={{ padding: '0.85rem 1.25rem', fontSize: '0.92rem' }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

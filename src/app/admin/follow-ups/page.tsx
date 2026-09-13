@@ -4,7 +4,8 @@ import prisma from '@/lib/prisma';
 import { formatDate, formatDateTime, getLeadStatusBadgeClass } from '@/lib/utils';
 import { PhoneCall, Calendar, Clock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function AdminFollowUpsPage() {
   const now = new Date();
