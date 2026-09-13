@@ -26,9 +26,9 @@ export default function LeadDetailClient({ id }: { id: string }) {
   const router = useRouter();
 
   const [lead, setLead] = useState<any>(() => {
-    return initialLeads.find((l: any) => l.id === id) || initialLeads[0];
+    return initialLeads.find((l: any) => l.id === id) || null;
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(!initialLeads.some((l: any) => l.id === id));
   const [team, setTeam] = useState<any[]>([
     { id: 'usr_admin', name: 'Super Admin', role: 'SUPER_ADMIN' },
     { id: 'usr_rahul', name: 'Rahul Bisht', role: 'ADMIN' },
@@ -69,17 +69,32 @@ export default function LeadDetailClient({ id }: { id: string }) {
   });
 
   const [submitting, setSubmitting] = useState(false);
+  const [pipelineStage, setPipelineStage] = useState('');
+  const [assignedUserId, setAssignedUserId] = useState('');
+  const [pipelineNote, setPipelineNote] = useState('');
+  const [savingPipeline, setSavingPipeline] = useState(false);
+  const [pipelineFeedback, setPipelineFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const fetchLeadDetails = async () => {
     try {
-      const res = await fetch(`/api/leads/${id}`);
+      const headers: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        const u = localStorage.getItem('osb_user');
+        if (u) headers['x-osb-user'] = encodeURIComponent(u);
+      }
+
+      const res = await fetch(`/api/leads/${id}`, { headers, cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        if (data.lead) setLead(data.lead);
+        if (data.lead) {
+          setLead(data.lead);
+          setPipelineStage(data.lead.status || 'NEW');
+          setAssignedUserId(data.lead.assignedUserId || '');
+        }
       }
 
       // Also fetch sales team
-      const reportRes = await fetch('/api/reports');
+      const reportRes = await fetch('/api/reports', { headers, cache: 'no-store' });
       if (reportRes.ok) {
         const reportData = await reportRes.json();
         if (reportData.salesTeamPerformance) {
@@ -97,7 +112,59 @@ export default function LeadDetailClient({ id }: { id: string }) {
     fetchLeadDetails();
   }, [id]);
 
+  useEffect(() => {
+    if (lead) {
+      setPipelineStage(lead.status || 'NEW');
+      setAssignedUserId(lead.assignedUserId || '');
+    }
+  }, [lead?.status, lead?.assignedUserId]);
+
+  const handleSavePipeline = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setSavingPipeline(true);
+    setPipelineFeedback(null);
+    try {
+      const res = await fetch(`/api/leads/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: pipelineStage,
+          assignedUserId: assignedUserId || null,
+          notes: pipelineNote.trim() || undefined,
+        }),
+      });
+      if (res.ok) {
+        setLead((prev: any) => prev ? {
+          ...prev,
+          status: pipelineStage,
+          assignedUserId: assignedUserId,
+          assignedUser: team.find((t) => t.id === assignedUserId) || prev.assignedUser,
+        } : prev);
+        setPipelineFeedback({
+          type: 'success',
+          message: `Lead pipeline updated to "${pipelineStage}" successfully!`,
+        });
+        setPipelineNote('');
+        fetchLeadDetails();
+        setTimeout(() => setPipelineFeedback(null), 4000);
+      } else {
+        setPipelineFeedback({
+          type: 'error',
+          message: 'Failed to update lead status. Please try again.',
+        });
+      }
+    } catch (err: any) {
+      setPipelineFeedback({
+        type: 'error',
+        message: err.message || 'Error communicating with server.',
+      });
+    } finally {
+      setSavingPipeline(false);
+    }
+  };
+
   const handleStatusChange = async (newStatus: string) => {
+    setPipelineStage(newStatus);
     try {
       const res = await fetch(`/api/leads/${id}`, {
         method: 'PATCH',
@@ -111,6 +178,7 @@ export default function LeadDetailClient({ id }: { id: string }) {
   };
 
   const handleAssigneeChange = async (newUserId: string) => {
+    setAssignedUserId(newUserId);
     try {
       const res = await fetch(`/api/leads/${id}`, {
         method: 'PATCH',
@@ -314,15 +382,21 @@ export default function LeadDetailClient({ id }: { id: string }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Status & Assignment Card */}
           <div className="luxury-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-dark)', marginBottom: '1.25rem' }}>
-              Pipeline Status &amp; Assignment
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', color: 'var(--primary-dark)', margin: 0 }}>
+                Pipeline Status &amp; Assignment
+              </h3>
+              <span className={getLeadStatusBadgeClass(pipelineStage || lead.status)} style={{ fontSize: '0.78rem' }}>
+                Current: {pipelineStage || lead.status}
+              </span>
+            </div>
 
             <div className="form-group">
-              <label className="form-label">Update Lead Stage</label>
+              <label className="form-label" htmlFor="select-lead-stage">Update Lead Stage</label>
               <select
-                value={lead.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
+                id="select-lead-stage"
+                value={pipelineStage}
+                onChange={(e) => setPipelineStage(e.target.value)}
                 className="form-select"
               >
                 <option value="NEW">NEW</option>
@@ -339,10 +413,11 @@ export default function LeadDetailClient({ id }: { id: string }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Assigned Sales Executive</label>
+              <label className="form-label" htmlFor="select-lead-assignee">Assigned Sales Executive</label>
               <select
-                value={lead.assignedUserId || ''}
-                onChange={(e) => handleAssigneeChange(e.target.value)}
+                id="select-lead-assignee"
+                value={assignedUserId}
+                onChange={(e) => setAssignedUserId(e.target.value)}
                 className="form-select"
               >
                 <option value="">Unassigned</option>
@@ -353,6 +428,69 @@ export default function LeadDetailClient({ id }: { id: string }) {
                 ))}
               </select>
             </div>
+
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label className="form-label" htmlFor="input-pipeline-note">
+                Action / Internal Note <span style={{ color: '#94a3b8', fontWeight: 400 }}>(Optional)</span>
+              </label>
+              <textarea
+                id="input-pipeline-note"
+                rows={2}
+                placeholder="E.g., Customer confirmed site visit on weekend, requested revised quotation..."
+                className="form-textarea"
+                value={pipelineNote}
+                onChange={(e) => setPipelineNote(e.target.value)}
+              />
+            </div>
+
+            {/* Prominent Submit Button */}
+            <button
+              type="button"
+              id="btn-save-lead-pipeline"
+              onClick={() => handleSavePipeline()}
+              disabled={savingPipeline}
+              className="btn-primary"
+              style={{
+                width: '100%',
+                justifyContent: 'center',
+                padding: '0.85rem 1.25rem',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                boxShadow: '0 4px 14px rgba(228, 170, 60, 0.35)',
+                cursor: savingPipeline ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {savingPipeline ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" /> Saving Changes...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={16} /> Save Pipeline Changes
+                </>
+              )}
+            </button>
+
+            {/* Feedback Message */}
+            {pipelineFeedback && (
+              <div
+                style={{
+                  marginTop: '0.85rem',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  background: pipelineFeedback.type === 'success' ? '#dcfce7' : '#fee2e2',
+                  color: pipelineFeedback.type === 'success' ? '#15803d' : '#b91c1c',
+                  border: `1px solid ${pipelineFeedback.type === 'success' ? '#86efac' : '#fca5a5'}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                }}
+              >
+                {pipelineFeedback.type === 'success' ? '✓' : '⚠️'} {pipelineFeedback.message}
+              </div>
+            )}
           </div>
 
           {/* Property Interests Card */}

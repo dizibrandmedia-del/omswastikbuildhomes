@@ -586,6 +586,56 @@ img {
   }
 }
 
+/* Master Plan Layout & Responsive Grid */
+.master-plan-grid-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 2.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1024px) {
+  .master-plan-grid-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  #selected-plot-inspector {
+    position: static !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+.master-plan-canvas-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  height: 580px;
+  overflow: hidden;
+  background: #040d13;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .master-plan-canvas-wrap {
+    min-height: 340px;
+    height: 420px;
+  }
+}
+
+@media (max-width: 480px) {
+  .master-plan-canvas-wrap {
+    min-height: 280px;
+    height: 350px;
+  }
+}
+
 /* Calculator Outer Card */
 .pricing-calc-card {
   padding: 2.5rem;
@@ -1001,6 +1051,148 @@ img {
     padding: 1.25rem 1rem !important;
   }
 }
+/* Brochure Infrastructure Blueprint Section Responsive Classes */
+.blueprint-card {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  background-color: rgba(0, 41, 44, 0.9);
+  border: 1px solid rgba(228, 170, 60, 0.4);
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
 
+.blueprint-features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+}
 
+.blueprint-metrics-box {
+  background-color: rgba(228, 170, 60, 0.12);
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
 
+.blueprint-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem 1rem;
+  text-align: center;
+}
+
+.blueprint-metric-val {
+  font-size: clamp(1.4rem, 2.8vw, 1.85rem);
+  font-weight: 700;
+  font-family: var(--font-heading);
+  line-height: 1.15;
+  word-break: break-word;
+}
+
+.blueprint-metric-val .unit {
+  font-size: 0.68em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.blueprint-metric-lbl {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  margin-top: 0.35rem;
+  letter-spacing: 0.05em;
+  line-height: 1.3;
+}
+
+@media (max-width: 960px) {
+  .blueprint-card {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .blueprint-card {
+    padding: 1.5rem 1rem;
+    border-radius: 14px;
+    gap: 1.75rem;
+  }
+
+  .blueprint-features-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .blueprint-metrics-box {
+    padding: 1.25rem 0.85rem;
+    border-radius: 12px;
+  }
+
+  .blueprint-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 0.75rem;
+  }
+
+  .blueprint-metric-val {
+    font-size: clamp(1.15rem, 5.2vw, 1.45rem);
+  }
+
+  .blueprint-metric-val .unit {
+    font-size: 0.65em;
+  }
+
+  .blueprint-metric-lbl {
+    font-size: 0.68rem;
+    margin-top: 0.2rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .blueprint-card {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .blueprint-metrics-box {
+    padding: 1rem 0.5rem;
+  }
+
+  .blueprint-metrics-grid {
+    gap: 1rem 0.5rem;
+  }
+
+  .blueprint-metric-val {
+    font-size: 1.1rem;
+  }
+}
+
+/* Real Estate Luxury Modal Enhancements */
+.modal-field-luxury {
+  transition: all 0.2s ease;
+  outline: none;
+}
+.modal-field-luxury:focus {
+  border-color: var(--gold) !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(228, 170, 60, 0.2) !important;
+}
+.modal-close-luxury {
+  transition: all 0.2s ease;
+}
+.modal-close-luxury:hover {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: var(--gold) !important;
+  transform: scale(1.05);
+}

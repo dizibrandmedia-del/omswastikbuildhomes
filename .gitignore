@@ -21,11 +21,14 @@ dist/
 *.db-shm
 prisma/dev.db-journal
 
-# Scratch & Temporary
 scratch/
 public_html_ready/
+realtime_update_staging/
+login.html
+public/videos/
 *.zip
 *.log
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

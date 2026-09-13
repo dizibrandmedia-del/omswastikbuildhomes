@@ -6,7 +6,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name,
-      mobile,
+      mobile: rawMobile,
+      phone: rawPhone,
       email,
       budget,
       requirement,
@@ -17,7 +18,9 @@ export async function POST(req: NextRequest) {
       isSiteVisit = false,
       visitDate,
       visitTimeSlot,
+      purpose,
     } = body;
+    const mobile = rawMobile || rawPhone;
 
     // 1. Anti-spam honeypot check
     if (honeypot && honeypot.trim().length > 0) {
@@ -58,6 +61,30 @@ export async function POST(req: NextRequest) {
       assignedUserId = executive.id;
     }
 
+    // 3.1 Auto-resolve Project (support id or slug, or fallback to active project)
+    let resolvedProjectId: string | null = null;
+    if (projectId) {
+      const matchedProject = await prisma.project.findFirst({
+        where: {
+          OR: [{ id: projectId }, { slug: projectId }],
+        },
+        select: { id: true },
+      });
+      if (matchedProject) {
+        resolvedProjectId = matchedProject.id;
+      }
+    }
+
+    if (!resolvedProjectId) {
+      const activeProject = await prisma.project.findFirst({
+        where: { status: 'ACTIVE' },
+        select: { id: true },
+      });
+      if (activeProject) {
+        resolvedProjectId = activeProject.id;
+      }
+    }
+
     // 4. Create Lead in Database
     const lead = await prisma.lead.create({
       data: {
@@ -66,7 +93,7 @@ export async function POST(req: NextRequest) {
         email: email && email.trim() ? email.trim() : null,
         budget: budget || null,
         requirement: requirement || null,
-        interestedProjectId: projectId || null,
+        interestedProjectId: resolvedProjectId,
         interestedPlotId: plotId || null,
         leadSource: source,
         assignedUserId: assignedUserId,
@@ -75,11 +102,11 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. If Site Visit Requested, create SiteVisit record
-    if (isSiteVisit && visitDate && projectId) {
+    if (isSiteVisit && visitDate && resolvedProjectId) {
       await prisma.siteVisit.create({
         data: {
           leadId: lead.id,
-          projectId: projectId,
+          projectId: resolvedProjectId,
           plotId: plotId || null,
           assignedUserId: assignedUserId,
           visitDate: new Date(visitDate),
@@ -102,11 +129,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const downloadUrl =
+      purpose === 'brochure'
+        ? '/brochure.pdf'
+        : purpose === 'master_plan'
+        ? '/Om_Swastik_Master_Plan.pdf'
+        : undefined;
+
     return NextResponse.json(
       {
         success: true,
         message: 'Your enquiry has been successfully registered.',
         leadId: lead.id,
+        downloadUrl,
       },
       { status: 201 }
     );

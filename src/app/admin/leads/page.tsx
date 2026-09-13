@@ -3,15 +3,17 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatDate, getLeadStatusBadgeClass } from '@/lib/utils';
-import { Users, Search, Filter, Plus, Phone, Calendar, ArrowRight, Loader2, X } from 'lucide-react';
+import { Users, Search, Filter, Plus, Phone, Calendar, ArrowRight, Loader2, X, RefreshCw } from 'lucide-react';
 import initialLeads from '@/lib/initialLeads.json';
 
 export default function AdminLeadsPage() {
-  const [leads, setLeads] = useState<any[]>(initialLeads);
-  const [loading, setLoading] = useState(false);
+  const [leads, setLeads] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [lastSyncedTime, setLastSyncedTime] = useState<string>('');
 
   // New Lead form state
   const [newLead, setNewLead] = useState({
@@ -24,24 +26,65 @@ export default function AdminLeadsPage() {
   });
   const [saving, setSaving] = useState(false);
 
-  const fetchLeads = async () => {
+  const fetchLeads = async (silent = false) => {
     try {
-      const res = await fetch(`/api/leads?status=${selectedStatus}&search=${encodeURIComponent(searchTerm)}`);
+      if (!silent) {
+        setLoading(true);
+      } else {
+        setIsRefreshing(true);
+      }
+
+      const headers: Record<string, string> = {};
+      if (typeof window !== 'undefined') {
+        const u = localStorage.getItem('osb_user');
+        if (u) headers['x-osb-user'] = encodeURIComponent(u);
+      }
+
+      const res = await fetch(`/api/leads?status=${selectedStatus}&search=${encodeURIComponent(searchTerm)}`, {
+        headers,
+        cache: 'no-store',
+      });
+
       if (res.ok) {
         const data = await res.json();
-        if (data.leads && Array.isArray(data.leads) && data.leads.length > 0) {
+        if (data.leads && Array.isArray(data.leads)) {
           setLeads(data.leads);
+          setLastSyncedTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
         }
       }
     } catch (err) {
       console.error('Fetch leads error:', err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
     fetchLeads();
+
+    // Auto-refresh every 8 seconds so any enquiry submitted on website shows up immediately
+    const interval = setInterval(() => {
+      fetchLeads(true);
+    }, 8000);
+
+    // Refresh immediately when tab gains focus or on lead submitted event
+    const handleFocus = () => fetchLeads(true);
+    const handleLeadSubmitted = () => fetchLeads(true);
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'osb_last_lead_time') fetchLeads(true);
+    };
+
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('osb_lead_submitted', handleLeadSubmitted);
+    window.addEventListener('storage', handleStorage);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('osb_lead_submitted', handleLeadSubmitted);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [selectedStatus]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -109,20 +152,66 @@ export default function AdminLeadsPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
-          <h1 style={{ fontSize: '2rem', color: 'var(--primary-dark)', margin: 0 }}>Leads Management Hub</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '2rem', color: 'var(--primary-dark)', margin: 0 }}>Leads Management Hub</h1>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.72rem',
+                fontWeight: 600,
+                color: '#166534',
+                background: '#dcfce7',
+                border: '1px solid #bbf7d0',
+                padding: '0.2rem 0.55rem',
+                borderRadius: '999px',
+              }}
+            >
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block' }} />
+              Live Sync Active
+            </span>
+          </div>
           <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-            Central pipeline connecting website inquiries, WhatsApp chats, and phone consultations.
+            Direct pipeline: website allotment enquiries &amp; ground visits update instantly.
+            {lastSyncedTime && <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', color: '#94a3b8' }}>• Last synced at {lastSyncedTime}</span>}
           </p>
         </div>
 
-        <button
-          id="btn-open-add-lead"
-          onClick={() => setIsAddModalOpen(true)}
-          className="btn-primary"
-          style={{ fontSize: '0.875rem' }}
-        >
-          <Plus size={16} /> Add Manual Lead
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <button
+            id="btn-refresh-leads"
+            onClick={() => fetchLeads(false)}
+            disabled={loading || isRefreshing}
+            style={{
+              padding: '0.55rem 0.95rem',
+              fontSize: '0.84rem',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              backgroundColor: '#ffffff',
+              border: '1px solid #cbd5e1',
+              color: '#334155',
+              transition: 'all 0.15s ease',
+            }}
+            title="Refresh Leads"
+          >
+            <RefreshCw size={14} className={(loading || isRefreshing) ? 'animate-spin' : ''} />
+            <span>{(loading || isRefreshing) ? 'Syncing...' : 'Refresh'}</span>
+          </button>
+
+          <button
+            id="btn-open-add-lead"
+            onClick={() => setIsAddModalOpen(true)}
+            className="btn-primary"
+            style={{ fontSize: '0.875rem' }}
+          >
+            <Plus size={16} /> Add Manual Lead
+          </button>
+        </div>
       </div>
 
       {/* Filter & Search Bar */}

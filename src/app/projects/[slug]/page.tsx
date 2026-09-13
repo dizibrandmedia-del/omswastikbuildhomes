@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Compass,
   ArrowRight,
-  Layers
+  Layers,
+  Download
 } from 'lucide-react';
 
 interface ProjectDetailProps {
@@ -70,6 +71,9 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
 
   const availableCount = project.plots.filter((p) => p.status === 'AVAILABLE').length;
 
+  const isRiddhi = slug === 'riddhi';
+  const heroImageSrc = isRiddhi ? '/images/brochure/hero-gate.webp' : (project.heroImage || '/images/hero-dholera.jpg');
+
   return (
     <>
       <Navbar />
@@ -78,50 +82,71 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
       <section
         style={{
           position: 'relative',
-          padding: '5rem 0',
+          padding: '6rem 0 5rem',
           backgroundColor: '#002e32',
-          backgroundImage: 'linear-gradient(rgba(0, 46, 50, 0.85), rgba(16, 26, 29, 0.95))',
           color: '#ffffff',
           borderBottom: '2px solid var(--gold)',
+          overflow: 'hidden',
         }}
       >
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url(${project.heroImage || '/images/hero-dholera.jpg'})`,
+            backgroundImage: `url(${heroImageSrc})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: 0.25,
+            backgroundPosition: 'center 40%',
+            filter: 'brightness(1.08) contrast(1.05) saturate(1.05)',
             zIndex: 0,
+          }}
+        />
+
+        {/* Clear & Luminous Gradient Overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(90deg, rgba(0, 30, 33, 0.85) 0%, rgba(0, 32, 35, 0.68) 45%, rgba(0, 35, 38, 0.22) 75%, rgba(0, 35, 38, 0.04) 100%), linear-gradient(180deg, rgba(0, 25, 28, 0.3) 0%, rgba(0, 0, 0, 0) 35%, rgba(10, 20, 22, 0.45) 100%)',
+            zIndex: 1,
           }}
         />
 
         <div className="container-custom" style={{ position: 'relative', zIndex: 10 }}>
           <div style={{ maxWidth: '840px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
               <span className="gold-badge">
                 <ShieldCheck size={14} /> Developer Direct Allotment
               </span>
               <span style={{ color: 'var(--gold)', fontSize: '0.85rem', fontWeight: 600 }}>
                 {project.reraNumber || 'Verified Clear Title'}
               </span>
+              {isRiddhi && (
+                <span style={{ background: 'rgba(228, 170, 60, 0.2)', color: 'var(--gold-light)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>
+                  A Premium Residency • Kamiyala
+                </span>
+              )}
             </div>
 
-            <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#ffffff', marginBottom: '0.5rem' }}>
+            <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', color: '#ffffff', marginBottom: '0.25rem', fontFamily: 'var(--font-heading)' }}>
               {project.name}
             </h1>
+            {isRiddhi && (
+              <div style={{ color: 'var(--gold)', fontStyle: 'italic', fontSize: '1.35rem', marginBottom: '0.75rem' }}>
+                PREMIUM PLOTS | PRIME PLOTS
+              </div>
+            )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#cbd5e1', fontSize: '1.1rem', marginBottom: '1.5rem' }}>
               <MapPin size={18} style={{ color: 'var(--gold)' }} />
-              <span>{project.fullAddress || project.location}</span>
+              <span>{isRiddhi ? 'Kamiyala, Dholera Special Investment Region (SIR), Gujarat' : (project.fullAddress || project.location)}</span>
             </div>
 
             <p style={{ fontSize: '1.1rem', color: '#e2e8f0', lineHeight: 1.7, marginBottom: '2rem' }}>
               {project.description}
             </p>
 
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <a href="#inventory" className="btn-primary">
                 View Available Plots ({availableCount} Open)
                 <ArrowRight size={16} />
@@ -129,6 +154,24 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
               <a href="#site-layout" className="btn-secondary">
                 Inspect Site Layout
               </a>
+              <button
+                type="button"
+                data-action="download-brochure"
+                className="btn-outline-gold"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'transparent' }}
+              >
+                <Download size={16} />
+                Official Brochure
+              </button>
+              <button
+                type="button"
+                data-action="download-masterplan"
+                className="btn-outline-gold"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', background: 'transparent' }}
+              >
+                <Download size={16} />
+                Master Plan (PDF)
+              </button>
             </div>
           </div>
         </div>
@@ -141,7 +184,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             {/* Highlights */}
             <div>
               <span className="gold-badge" style={{ marginBottom: '0.75rem' }}>Investment Pillars</span>
-              <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem' }}>Project Highlights</h2>
+              <h2 style={{ fontSize: '2.2rem', marginBottom: '1.5rem', fontFamily: 'var(--font-heading)' }}>Project Highlights</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {highlights.map((h, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
@@ -155,7 +198,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
             {/* Quick Facts Card */}
             <div>
               <div className="luxury-card" style={{ padding: '2rem', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
-                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', marginBottom: '1.25rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', marginBottom: '1.25rem', borderBottom: '1px solid #cbd5e1', paddingBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
                   Project Overview &amp; Specifications
                 </h3>
 
@@ -163,6 +206,11 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
                     <span style={{ color: '#64748b' }}>Project Type</span>
                     <strong style={{ color: 'var(--dark)' }}>{project.projectType.replace('_', ' ')}</strong>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
+                    <span style={{ color: '#64748b' }}>Location Node</span>
+                    <strong style={{ color: 'var(--dark)' }}>Kamiyala, Dholera SIR</strong>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem' }}>
@@ -201,7 +249,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         <div className="container-custom">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3rem' }}>
             <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Demarcated Master Plan</span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem' }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
               Master Site Layout Plan
             </h2>
             <p style={{ color: '#64748b', fontSize: '1.05rem' }}>
@@ -251,7 +299,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         <div className="container-custom">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3rem' }}>
             <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Direct Allotment Grid</span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem' }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
               Live Plot Inventory for {project.name}
             </h2>
             <p style={{ color: '#64748b', fontSize: '1.05rem' }}>
@@ -271,7 +319,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         <div className="container-custom">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3.5rem' }}>
             <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Planned Infrastructure</span>
-            <h2 style={{ color: '#ffffff', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem' }}>
+            <h2 style={{ color: '#ffffff', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
               Amenities &amp; Project Features
             </h2>
             <p style={{ color: '#cbd5e1', fontSize: '1.05rem' }}>
@@ -306,7 +354,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
         <div className="container-custom">
           <div style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto 3.5rem' }}>
             <span className="gold-badge" style={{ marginBottom: '0.5rem' }}>Strategic Hub</span>
-            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem' }}>
+            <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', marginBottom: '0.75rem', fontFamily: 'var(--font-heading)' }}>
               Connectivity &amp; Proximity
             </h2>
           </div>
@@ -317,7 +365,7 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
                 <div style={{ fontSize: '0.8rem', color: 'var(--gold-deep)', fontWeight: 600, textTransform: 'uppercase' }}>
                   Nearby Catalyst
                 </div>
-                <h4 style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', margin: '0.5rem 0' }}>
+                <h4 style={{ fontSize: '1.3rem', color: 'var(--primary-dark)', margin: '0.5rem 0', fontFamily: 'var(--font-heading)' }}>
                   {lm.name}
                 </h4>
                 <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary)' }}>

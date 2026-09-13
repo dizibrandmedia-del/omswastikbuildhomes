@@ -18,6 +18,18 @@ interface VideoItem {
 
 const INITIAL_VIDEOS: VideoItem[] = [
   {
+    id: 'cmtwo406m0000v1386ndimoxh',
+    title: 'Riddhi Ground Site Tour & Plot Demarcation 2026',
+    description: 'Authentic ground site video walkthrough showing plot demarcation, wide internal roads, boundary pillars, and infrastructure progress at Riddhi, Dholera SIR.',
+    videoUrl: '/videos/riddhi-dholera-ground-footage.mp4',
+    youtubeId: null,
+    thumbnailUrl: '/images/riddhi-project.jpg',
+    category: 'Site Tour',
+    displayOrder: 1,
+    isActive: true,
+    createdAt: '2026-09-11T12:00:00.000Z',
+  },
+  {
     id: 'cmtu3tbod0023v1lcf5h3deg0',
     title: 'Dholera SIR Mega Master Plan & Drone Aerial Tour 2026',
     description: 'Exclusive aerial perspective of the 250m multi-modal transport corridor, administrative building (ABCD), and central activation area in Dholera SIR.',
@@ -25,7 +37,7 @@ const INITIAL_VIDEOS: VideoItem[] = [
     youtubeId: 'ScMzIvxBSi4',
     thumbnailUrl: '/images/hero-dholera.jpg',
     category: 'Dholera SIR',
-    displayOrder: 1,
+    displayOrder: 2,
     isActive: true,
     createdAt: '2026-09-09T12:58:10.141Z',
   },
@@ -37,7 +49,7 @@ const INITIAL_VIDEOS: VideoItem[] = [
     youtubeId: 'kJQP7kiw5Fk',
     thumbnailUrl: '/images/riddhi-project.jpg',
     category: 'Site Tour',
-    displayOrder: 2,
+    displayOrder: 3,
     isActive: true,
     createdAt: '2026-09-09T12:58:10.148Z',
   },
@@ -49,7 +61,7 @@ const INITIAL_VIDEOS: VideoItem[] = [
     youtubeId: 'L_LUpnjgPso',
     thumbnailUrl: '/images/about-dholera.jpg',
     category: 'Development',
-    displayOrder: 3,
+    displayOrder: 4,
     isActive: true,
     createdAt: '2026-09-09T12:58:10.155Z',
   },
@@ -61,7 +73,7 @@ const INITIAL_VIDEOS: VideoItem[] = [
     youtubeId: '21X5lGlDOfg',
     thumbnailUrl: '/images/investment-bg.jpg',
     category: 'Industrial',
-    displayOrder: 4,
+    displayOrder: 5,
     isActive: true,
     createdAt: '2026-09-09T12:58:10.163Z',
   },
@@ -272,7 +284,7 @@ export default function AdminVideosPage() {
           </button>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+        <div id="admin-video-cards-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
           {videos.map((video) => (
             <div
               key={video.id}
@@ -746,25 +758,42 @@ export default function AdminVideosPage() {
           </div>
 
           <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000000' }}>
-            <iframe
-              id="video-preview-iframe"
-              src={
-                previewVideo?.youtubeId
-                  ? `https://www.youtube.com/embed/${previewVideo.youtubeId}?autoplay=1`
-                  : (previewVideo?.videoUrl || '')
-              }
-              title={previewVideo?.title || 'Preview'}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                border: 'none',
-              }}
-            />
+            {previewVideo?.videoUrl?.includes('.mp4') || previewVideo?.videoUrl?.startsWith('/videos/') ? (
+              <video
+                controls
+                autoPlay
+                playsInline
+                src={previewVideo.videoUrl}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                }}
+              />
+            ) : (
+              <iframe
+                id="video-preview-iframe"
+                src={
+                  previewVideo?.youtubeId
+                    ? `https://www.youtube.com/embed/${previewVideo.youtubeId}?autoplay=1`
+                    : (previewVideo?.videoUrl || '')
+                }
+                title={previewVideo?.title || 'Preview'}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                }}
+              />
+            )}
           </div>
 
           <div id="video-preview-desc" style={{ padding: '1rem 1.25rem', color: '#cbd5e1', fontSize: '0.85rem' }}>

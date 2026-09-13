@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Film, Play, X, Compass, ExternalLink } from 'lucide-react';
 
@@ -18,8 +18,31 @@ interface HomeVideoGalleryProps {
   videos: VideoData[];
 }
 
-export default function HomeVideoGallery({ videos }: HomeVideoGalleryProps) {
+export default function HomeVideoGallery({ videos: initialVideos }: HomeVideoGalleryProps) {
+  const [videos, setVideos] = useState<VideoData[]>(initialVideos || []);
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  useEffect(() => {
+    fetch('/api/videos?t=' + Date.now(), { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => {
+        const liveVideos = data?.videos || (Array.isArray(data) ? data : null);
+        if (liveVideos && Array.isArray(liveVideos) && liveVideos.length > 0) {
+          setVideos(
+            liveVideos.map((v: any) => ({
+              id: v.id,
+              title: v.title,
+              description: v.description,
+              videoUrl: v.youtubeUrl || v.videoUrl || '',
+              youtubeId: v.embedUrl || v.youtubeId || null,
+              thumbnailUrl: v.thumbnailUrl,
+              category: v.category || 'Dholera SIR',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   if (!videos || videos.length === 0) return null;
 
@@ -331,6 +354,23 @@ export default function HomeVideoGallery({ videos }: HomeVideoGalleryProps) {
                   width: '100%',
                   height: '100%',
                   border: 'none',
+                  display: 'none',
+                }}
+              />
+              <video
+                id="video-modal-html5"
+                controls
+                playsInline
+                preload="metadata"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  backgroundColor: '#000000',
+                  display: 'none',
                 }}
               />
             </div>
@@ -348,18 +388,20 @@ export default function HomeVideoGallery({ videos }: HomeVideoGalleryProps) {
               function initVideoGallery() {
                 var modal = document.getElementById('omswastik-video-modal');
                 var iframe = document.getElementById('video-modal-iframe');
+                var videoEl = document.getElementById('video-modal-html5');
                 var titleEl = document.getElementById('video-modal-title');
                 var catEl = document.getElementById('video-modal-cat');
                 var descEl = document.getElementById('video-modal-desc');
 
                 function closeVideo() {
                   if (modal) modal.style.display = 'none';
-                  if (iframe) iframe.src = '';
+                  if (iframe) { iframe.src = ''; iframe.style.display = 'none'; }
+                  if (videoEl) { videoEl.pause(); videoEl.src = ''; videoEl.style.display = 'none'; }
                   document.body.style.overflow = '';
                 }
 
                 function openVideo(card) {
-                  if (!modal || !iframe) return;
+                  if (!modal) return;
                   var embed = card.getAttribute('data-video-embed') || '';
                   var title = card.getAttribute('data-video-title') || '';
                   var cat = card.getAttribute('data-video-category') || '';
@@ -376,7 +418,22 @@ export default function HomeVideoGallery({ videos }: HomeVideoGalleryProps) {
                     }
                   }
 
-                  iframe.src = embed;
+                  var isMp4 = embed.indexOf('.mp4') !== -1 || embed.indexOf('/videos/') !== -1;
+                  if (isMp4) {
+                    if (iframe) { iframe.src = ''; iframe.style.display = 'none'; }
+                    if (videoEl) {
+                      videoEl.src = embed;
+                      videoEl.style.display = 'block';
+                      videoEl.play().catch(function() {});
+                    }
+                  } else {
+                    if (videoEl) { videoEl.pause(); videoEl.src = ''; videoEl.style.display = 'none'; }
+                    if (iframe) {
+                      iframe.src = embed;
+                      iframe.style.display = 'block';
+                    }
+                  }
+
                   modal.style.display = 'flex';
                   document.body.style.overflow = 'hidden';
                 }

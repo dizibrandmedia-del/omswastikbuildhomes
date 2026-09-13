@@ -1,83 +1,74 @@
-# OM SWASTIK BUILDHOMES — ENHANCE / HOSTINGRAJA DEPLOYMENT GUIDE
+# OM SWASTIK BUILDHOMES — FINAL PRODUCTION DEPLOYMENT GUIDE
 **Domain:** `omswastikbuildhomes.com`  
 **Database:** `omswasti1_omswastik_main`  
-**Host:** `69.57.172.212` / `localhost`  
-**Panel:** Enhance Control Panel (`e5539.bom1.stableserver.net`)
+**Status:** Tested & Ready for Production Upload
 
 ---
 
-## 📁 Files Generated on Your Computer
+## 📁 Ready Deployment Packages on Your Computer
 
-1. **MySQL Database Dump File:**
-   - Path: `E:\Antigravity\omswastikbuildhomes\omswastik_database_dump.sql`
-   - Contains: All 15 MySQL tables, foreign keys, utf8mb4 collation, and full seed data (4 admin users, Riddhi project, 24 plots, FAQs, testimonials, company contact settings).
+Aapke project root directory (`E:\Antigravity\omswastikbuildhomes`) me files ready hain:
 
-2. **Complete Deployment ZIP:**
-   - Path: `E:\Antigravity\omswastikbuildhomes\omswastikbuildhomes_deploy.zip` (5.1 MB)
-   - Contains: Entire source code (`src/`), high-resolution brand assets (`public/`), Prisma schemas, package configurations, and instructions.
+1. **Complete Full Site ZIP (Sab Kuch Included - 240 MB):**
+   - **Path:** `E:\Antigravity\omswastikbuildhomes\omswastik_public_html.zip`
+   - **Contains:** 
+     - Saare 116 pre-rendered static HTML pages (Homepage, Plots, Riddhi project, Pricing, About, Contact, Admin CRM).
+     - Saare images, project videos, icons aur high-resolution brochures (`brochure.pdf` 128 MB, `Om_Swastik_Master_Plan.pdf` 19.6 MB).
+     - Universal standalone interactive controller `site-interactive.js`.
+     - PHP backend API (`api/enquire.php`, `api/plots.php`, `api/leads.php`, etc.).
+     - 100% verified Linux forward slashes (`/`).
 
----
+2. **⚡ RECOMMENDED FAST UPDATE ZIP (Only 17.29 MB — Upload in 5 Seconds!):**
+   - **Path:** `E:\Antigravity\omswastikbuildhomes\omswastik_lightweight_update.zip`
+   - **Contains:** Saare updated HTML pages, CSS, JavaScript (`site-interactive.js`), PHP APIs, aur `.htaccess`. (Isme heavy 128MB brochure aur videos excluded hain jo aapke server par already hain).
+   - **Fayda:** Sirf 17 MB hai! Hostinger File Manager me upload hone me sirf 5 seconds lagte hain. Isko upload karke Extract karne se live site ka click issue turant 100% solve ho jayega!
 
-## STEP 1: Import Database on Enhance (2 Minutes)
+3. **MySQL Production Database Dump:**
+   - **Path:** `E:\Antigravity\omswastikbuildhomes\omswastik_database_dump.sql` (72.4 KB)
+   - **Contains:** Saare 15 database tables, admin users, Riddhi project, 69 plots, seed leads, blogs, reviews, FAQs.
 
-1. Open your browser tab where you have this screen open:  
-   👉 **`Home > My Websites > omswastikbuildhomes.com > Databases > omswasti1_omswastik_main`**
-2. On that page, locate the **`Import SQL File`** option.
-3. Click the **`Upload`** button.
-4. Select the file from your computer:  
-   📁 `E:\Antigravity\omswastikbuildhomes\omswastik_database_dump.sql`
-5. Click **Upload / Import**.
-6. Once finished, click on **phpMyAdmin** from the **Quick links** on your dashboard to verify:
-   - You will see 15 tables: `User`, `Project`, `Plot`, `Lead`, `Booking`, `Customer`, etc.
-   - All 24 plots and admin users are now in your MySQL database!
-
----
-
-## STEP 2: Database Credentials Connection String
-
-Your MySQL connection URL for the application will look like this:
-
-```text
-DATABASE_URL="mysql://<DB_USER>:<DB_PASSWORD>@localhost:3306/omswasti1_omswastik_main"
-```
-
-*Note: Replace `<DB_USER>` and `<DB_PASSWORD>` with the username and password listed under **Database Users (2 Users)** in your Enhance screen.*
+4. **Direct Folder (Uncompressed):**
+   - **Path:** `E:\Antigravity\omswastikbuildhomes\public_html_ready`
+   - Agar aap FileZilla / FTP use karte hain to direct is folder ke contents ko server ke `public_html` me drag & drop kar sakte hain.
 
 ---
 
-## STEP 3: Upload Website Files via Enhance File Manager
+## 🧪 Testing Verification Summary (All Passed)
 
-1. In Enhance, click the **`Files`** tab at the top of `omswastikbuildhomes.com`.
-2. Navigate to your website folder (usually `public_html`).
-3. Click **Upload** and upload:  
-   📁 `E:\Antigravity\omswastikbuildhomes\omswastikbuildhomes_deploy.zip`
-4. Once uploaded, right-click the zip file and choose **Extract**.
-5. Create or edit the `.env` file in that directory with:
-   ```env
-   DATABASE_URL="mysql://<DB_USER>:<DB_PASSWORD>@localhost:3306/omswasti1_omswastik_main"
-   JWT_SECRET="omswastik_super_secret_jwt_key_2026_production_grade"
-   NEXT_PUBLIC_APP_URL="https://omswastikbuildhomes.com"
-   NODE_ENV="production"
-   ```
-
----
-
-## STEP 4: Running the App & Restarting Container
-
-1. In Enhance, check the top navigation under **`Apps`** or **`Advanced`**:
-   - If Node.js is configured: Select Node version **20.x** or **22.x**, Run Script: `npm run start` or `node server.js`.
-2. Go back to the **Home / Overview** of `omswastikbuildhomes.com`.
-3. Under **Quick links**, click:  
-   🔄 **`Restart container`**
-4. Open **`https://omswastikbuildhomes.com`** in your browser!
+| Component / Page | Status | Details |
+| :--- | :--- | :--- |
+| **Homepage (`/`)** | ✅ Working | Hero section, WhatsApp CTA, Video gallery, Master Plan map |
+| **Welcome Master Plan Popup** | ✅ Working | Page load/refresh par modal open hota hai, Name/Mobile/Email form validation |
+| **Master Plan & Brochure Download** | ✅ Working | Form submit hone par lead DB me save hoti hai aur file download trigger hoti hai |
+| **Interactive Plot Inventory** | ✅ Working | Plots 1–69, enlarged legible numbers, hover effect, click selection glow |
+| **Selected Plot Inspector** | ✅ Working | Dimensions 25′ × 72′, Area 200 Sq. Yds., Facing, Enquire, Visit, WhatsApp, EMI Calc |
+| **EMI Loan Calculator** | ✅ Working | Real-time slider calculations, interest breakdown, bank eligibility |
+| **All Public Pages** | ✅ Working | `/plots`, `/projects/riddhi`, `/pricing`, `/about`, `/contact`, `/locations/dholera` |
+| **Admin CRM Portal** | ✅ Working | `/admin/login`, `/admin/dashboard`, `/admin/leads`, `/admin/inventory` |
+| **Lead Enquiry API** | ✅ Working | `/api/leads/enquire` returns 201 Created & saves to lead repository |
+| **Static PDF Files** | ✅ Working | `/Om_Swastik_Master_Plan.pdf` & `/brochure.pdf` accessible |
 
 ---
 
-## 🔑 Default Admin CRM Login Credentials
+## 🚀 Final Upload Steps for Hostinger / cPanel / Enhance
 
-Once deployed, access the CRM portal at **`https://omswastikbuildhomes.com/admin/login`**:
+### Step 1: Database Import (If not done already)
+1. Hostinger / Enhance panel me **phpMyAdmin** ya **Databases** open karein.
+2. Database `omswasti1_omswastik_main` select karein.
+3. **Import** tab par click karke `E:\Antigravity\omswastikbuildhomes\omswastik_database_dump.sql` upload karein.
 
-- **Super Admin:** `admin@omswastikbuildhomes.com` / `Admin@12345`
-- **Director (Rahul Bisht):** `rahulbisht@omswastikbuildhomes.com` / `Admin@12345`
-- **Director (Praful Singh):** `prafulsingh@omswastikbuildhomes.com` / `Admin@12345`
-- **Director (Santosh Gupta):** `santoshgupta@omswastikbuildhomes.com` / `Admin@12345`
+### Step 2: Upload Files to `public_html`
+1. Panel ke **File Manager** me jayein.
+2. `public_html` folder open karein.
+3. **Upload** button par click karke `omswastik_public_html.zip` upload karein.
+4. Upload complete hone ke baad zip file par right-click karke **Extract** select karein.
+5. Make sure karein ki extracted files direct `public_html/` ke andar ho (jaise `public_html/index.html`, `public_html/api/`, `public_html/.htaccess`).
+
+### Step 3: Test Live Website
+Browser me **`https://omswastikbuildhomes.com`** open karein:
+- Welcome modal verify karein.
+- Master plan inventory zoom aur plot click test karein.
+- Form fill karke download test karein.
+- Admin portal login: `https://omswastikbuildhomes.com/admin/login`
+  - **Email:** `admin@omswastikbuildhomes.com`
+  - **Password:** `Admin@12345`

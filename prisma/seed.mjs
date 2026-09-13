@@ -16,6 +16,8 @@ async function main() {
   await prisma.plot.deleteMany({});
   await prisma.faq.deleteMany({});
   await prisma.testimonial.deleteMany({});
+  await prisma.video.deleteMany({});
+  await prisma.blogPost.deleteMany({});
 
   // 1. Users & Directors
   const defaultPasswordHash = await bcrypt.hash('Admin@12345', 10);
@@ -421,7 +423,201 @@ async function main() {
     await prisma.testimonial.create({ data: t });
   }
 
-  console.log('Seeding completed successfully!');
+  // 9. Seed Videos
+  const videos = [
+    {
+      title: "Dholera SIR Mega Master Plan & Drone Aerial Tour 2026",
+      videoUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4",
+      youtubeId: "ScMzIvxBSi4",
+      thumbnailUrl: "/images/hero-dholera.jpg",
+      category: "Dholera SIR",
+      description: "Exclusive aerial perspective of the 250m multi-modal transport corridor, administrative building (ABCD), and central activation area in Dholera SIR.",
+      displayOrder: 1,
+      isActive: true,
+    },
+    {
+      title: "Riddhi Premium Plots: On-Site Demarcation & Road Work",
+      videoUrl: "https://www.youtube.com/watch?v=kJQP7kiw5Fk",
+      youtubeId: "kJQP7kiw5Fk",
+      thumbnailUrl: "/images/riddhi-project.jpg",
+      category: "Site Tour",
+      description: "Comprehensive site walkthrough showing wide 30ft & 40ft asphalt roads, boundary stones, and underground utility pipelines in Riddhi.",
+      displayOrder: 2,
+      isActive: true,
+    },
+    {
+      title: "Ahmedabad-Dholera Expressway Ground Speedrun & Connectivity",
+      videoUrl: "https://www.youtube.com/watch?v=L_LUpnjgPso",
+      youtubeId: "L_LUpnjgPso",
+      thumbnailUrl: "/images/about-dholera.jpg",
+      category: "Development",
+      description: "Drive through the 109 km high-speed expressway connecting SG Highway Ahmedabad to Dholera in under 45 minutes.",
+      displayOrder: 3,
+      isActive: true,
+    },
+    {
+      title: "Tata Electronics Semiconductor Fab & Industrial Boom",
+      videoUrl: "https://www.youtube.com/watch?v=21X5lGlDOfg",
+      youtubeId: "21X5lGlDOfg",
+      thumbnailUrl: "/images/investment-bg.jpg",
+      category: "Industrial",
+      description: "Inside India's premier semiconductor manufacturing ecosystem in Dholera SIR and its multiplier impact on property valuations.",
+      displayOrder: 4,
+      isActive: true,
+    }
+  ];
+
+  for (const v of videos) {
+    await prisma.video.create({ data: v });
+  }
+  console.log(`Created ${videos.length} videos for gallery`);
+
+  // 10. Seed Blog Posts
+  const blogPosts = [
+    {
+      title: "Why Dholera SIR is India's Most Lucrative Land Investment in 2026",
+      slug: "why-dholera-sir-is-indias-most-lucrative-land-investment-2026",
+      featuredImage: "/images/hero-dholera.jpg",
+      excerpt: "Discover how planned greenfield infrastructure, direct expressway access, and multi-billion dollar industrial investments make Dholera SIR an unbeatable wealth-creation corridor.",
+      category: "Market Intelligence",
+      readTime: "6 min read",
+      author: "Om Swastik Research Team",
+      status: "PUBLISHED",
+      publishedAt: new Date("2026-02-15T10:00:00Z"),
+      seoTitle: "Why Dholera SIR is the Best Land Investment in 2026 | Om Swastik",
+      seoDescription: "An in-depth market report on Dholera SIR capital appreciation, expressway connectivity, and Tata semiconductor fab impact.",
+      content: `### The Rise of India's First Greenfield Smart Metropolis
+
+India's economic trajectory is undergoing a historic shift, and at the absolute vanguard of this industrial revolution stands **Dholera Special Investment Region (SIR)**. Spanning over 920 sq. km—more than double the geographic footprint of Mumbai—Dholera is not an ordinary urban extension. It is India's first platinum-rated, purpose-built smart industrial city.
+
+For visionary investors seeking capital appreciation combined with asset security, plotted land developments in Dholera offer unprecedented potential.
+
+---
+
+### 1. The Greenfield Infrastructure Advantage
+Unlike legacy brownfield cities that struggle with retrofitting outdated drainage and congested arterial roads, Dholera SIR was planned from the ground up:
+* **Sub-surface Utility Corridors**: All power lines, potable water pipes, recycled industrial water conduits, and gigabit fiber cables are buried in accessible underground concrete ducts.
+* **SCADA-Controlled Central Operations**: The entire city's water flow, traffic signals, and power grids are monitored 24x7 from the centralized ABCD Building command center.
+* **Strict Statutory Zoning**: Clear segregation between heavy industrial, light manufacturing, residential, and high-density commercial zones ensures clean living and steady appreciation.
+
+---
+
+### 2. The Anchor Catalyst: Tata Electronics Semiconductor Fab
+The ongoing development of Tata Electronics' **$11 Billion commercial semiconductor fabrication plant** in Dholera SIR has firmly established Gujarat on the global technology map. 
+With over 20,000 high-skilled engineering jobs and dozens of allied global supply chain partners setting up operations, the demand for planned residential plots in surrounding developments like **Riddhi** is accelerating rapidly.
+
+---
+
+### 3. High-Speed Connectivity Corridors
+* **Ahmedabad–Dholera Expressway (109 km)**: Reduces transit time from SG Highway Ahmedabad to Dholera to just 40–45 minutes.
+* **Dholera International Cargo & Passenger Airport**: Planned to handle massive regional cargo alongside international passenger traffic, taking pressure off Ahmedabad airport.
+* **High Speed Rail Node**: A planned bullet train station will connect Dholera directly to the Mumbai–Ahmedabad high-speed corridor.
+
+---
+
+### 4. Why Plotted Development at 'Riddhi' Stands Out
+Purchasing raw agricultural land carries legal and zoning hazards. **Riddhi Premium Plots** by Om Swastik Buildhomes Pvt. Ltd. eliminates every bottleneck:
+* Demarcated boundary stones and wide 30ft & 40ft internal roads.
+* Direct proximity to the Expressway access interchanges.
+* Direct guidance and verified documentation handled by seasoned corporate leadership.
+
+---
+
+### Conclusion: Act in the Inflection Window
+Land investments in high-growth corridors follow an S-curve: early adoption yields generational wealth. As expressway operations commence and manufacturing units begin commissioning, entry prices will permanently reset higher. Contact our advisory desk today to inspect available plots at Riddhi.`
+    },
+    {
+      title: "Ahmedabad-Dholera Expressway & International Airport: 2026 Milestones",
+      slug: "ahmedabad-dholera-expressway-international-airport-2026-milestones",
+      featuredImage: "/images/about-dholera.jpg",
+      excerpt: "A comprehensive progress update on connectivity milestones: 109 km expressway operational status, international cargo runways, and regional logistics networks.",
+      category: "Infrastructure",
+      readTime: "5 min read",
+      author: "Infrastructure Advisory Desk",
+      status: "PUBLISHED",
+      publishedAt: new Date("2026-03-01T11:30:00Z"),
+      seoTitle: "Ahmedabad Dholera Expressway & Airport Progress 2026",
+      seoDescription: "Current status of the Ahmedabad Dholera Expressway and international airport in 2026.",
+      content: `### Connectivity: The Ultimate Value Driver for Real Estate
+
+In real estate, location is defined not by linear distance, but by travel time. The historic bottleneck between Ahmedabad and Dholera was the 2-hour commute via state highways. Today, that narrative has been rewritten with the near completion of the **Ahmedabad–Dholera Expressway**.
+
+---
+
+### The 109-Km Expressway Reality
+* **Travel Time Reduced to 45 Minutes**: Connecting Sardar Patel Ring Road in Ahmedabad to the heart of Dholera Activation Area.
+* **Access-Controlled 4-Lane Expandable to 8-Lane**: Designed for 120 km/h speeds, ensuring seamless transit for both industrial freight and daily commuters.
+* **Spur Interchanges**: Direct entry into residential zones like Riddhi, ensuring zero detour access for homeowners and commercial fleet operators.
+
+---
+
+### Dholera International Airport: Cargo Powerhouse
+Strategically located near Navagam, the Dholera International Airport is being developed to cater to:
+* **Dedicated Semiconductor & Electronics Air Freight**: High-value chip wafers require rapid global air transit; the Dholera airport provides an on-site tarmac just minutes from Tata Fab.
+* **Overspill Passenger Traffic from SVPI Ahmedabad**: Relieving Ahmedabad's saturated airspace with twin 4,000m runways capable of landing wide-body Boeing 777 and Airbus A380 aircraft.
+
+---
+
+### Investment Takeaway
+Properties positioned within a 10-15 minute radius of the expressway interchanges and airport arterial corridors command the highest rental yields and capital growth. Riddhi by Om Swastik Buildhomes is directly positioned within this golden radius.`
+    },
+    {
+      title: "Legal Due Diligence Checklist for Buying Plots in Dholera Gujarat",
+      slug: "legal-due-diligence-checklist-buying-plots-dholera-gujarat",
+      featuredImage: "/images/investment-bg.jpg",
+      excerpt: "Essential verification steps every prudent investor must know before purchasing land in Dholera SIR, including 7/12 extracts, zoning status, and clear title deed verification.",
+      category: "Investor Guide",
+      readTime: "7 min read",
+      author: "Legal & Regulatory Affairs",
+      status: "PUBLISHED",
+      publishedAt: new Date("2026-03-05T09:15:00Z"),
+      seoTitle: "Legal Due Diligence Checklist for Dholera Plots | Om Swastik",
+      seoDescription: "Step-by-step legal guide for land buyers in Dholera SIR: NA orders, title searches, and town planning schemes.",
+      content: `### Transparency First: Safeguarding Your Land Capital
+
+Purchasing land in an emerging metropolitan area is one of the most rewarding wealth creation strategies in India. However, it requires meticulous due diligence to ensure complete legal compliance and peace of mind.
+
+Here is the authoritative checklist curated by the legal advisory team at Om Swastik Buildhomes Pvt. Ltd.
+
+---
+
+### 1. Verification of Land Title & Ownership (7/12 and 8-A Extracts)
+* Always inspect the **AnyRoR (Any Records of Rights)** online revenue records maintained by the Revenue Department of Gujarat.
+* Verify that the seller's name appears as the legal owner without any encumbrances, litigation claims, or bank liens.
+* Ensure a 30-year search report is prepared by a qualified advocate.
+
+---
+
+### 2. Town Planning (TP) Scheme Allotment
+Dholera SIR is divided into distinct Town Planning (TP) schemes under the Dholera Special Investment Region Development Authority (DSIRDA).
+* Check whether the land falls within TP1, TP2, or subsequent phases.
+* Confirm that the final plot (FP) number has been demarcated from original survey plots.
+* Ensure road widening reservations or green buffer zones do not infringe on your boundaries.
+
+---
+
+### 3. Non-Agricultural (NA) & Non-Agricultural Industrial/Residential Permission
+* Agricultural land in Gujarat cannot be purchased by non-farmers without valid NA permission.
+* For plotted schemes, verify that the developer has obtained **valid NA approval** and sanctioned layout plans from the competent planning authority.
+
+---
+
+### 4. Demarcation & Physical Possession
+A paper title is only half the transaction. Physical demarcation guarantees security:
+* Look for fixed stone boundaries and numbered corner markers.
+* Check internal road widths (minimum 30 feet) to ensure emergency vehicle access and future utility laying.
+
+---
+
+### The Om Swastik Assurance
+At Om Swastik Buildhomes Pvt. Ltd., every single plot in **Riddhi** undergoes institutional-grade legal vetting before being made available to clients. Our executive leadership provides complete document sets for your independent legal counsel to inspect.`
+    }
+  ];
+
+  for (const b of blogPosts) {
+    await prisma.blogPost.create({ data: b });
+  }
+  console.log(`Created ${blogPosts.length} blog posts`);
 }
 
 main()

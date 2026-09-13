@@ -74,6 +74,48 @@ export default function Footer() {
                   <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Executive Desk & Office
                 </Link>
               </li>
+              <li>
+                <button
+                  type="button"
+                  data-action="download-brochure"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    color: 'var(--gold)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontWeight: 600,
+                    fontSize: 'inherit',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Download Official Brochure (PDF)
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  data-action="download-masterplan"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    color: 'var(--gold)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    fontWeight: 600,
+                    fontSize: 'inherit',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <ArrowUpRight size={14} style={{ color: 'var(--gold)' }} /> Download Master Plan Layout (PDF)
+                </button>
+              </li>
             </ul>
           </div>
 
