@@ -55,20 +55,30 @@ interface PlotInventoryViewerProps {
 
 const WHATSAPP_PHONE = '919599213531'; // Standard site WhatsApp
 
+// Natural numerical sort helper for plot numbers ('1'..'69')
+const sortByPlotNumber = <T extends { plotNumber: string | number }>(items: T[]): T[] => {
+  return [...items].sort((a, b) => {
+    const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
+  });
+};
+
 export default function PlotInventoryViewer({
   plots: initialPropPlots,
   projectName = 'Riddhi Premium Plots',
   projectId,
 }: PlotInventoryViewerProps) {
-  // Merge initial plots with coordinates
+  // Merge initial plots with coordinates and sort numerically 1 to 69
   const mergedInitialPlots: PlotData[] = useMemo(() => {
     const rawMap = new Map<string, any>();
     (initialPlotsRaw as any[]).forEach((p) => {
       rawMap.set(String(p.plotNumber), p);
     });
 
+    let list: PlotData[] = [];
     if (initialPropPlots && initialPropPlots.length > 0) {
-      return initialPropPlots.map((p) => {
+      list = initialPropPlots.map((p) => {
         const raw = rawMap.get(String(p.plotNumber));
         return {
           ...p,
@@ -79,15 +89,17 @@ export default function PlotInventoryViewer({
           coords: raw?.coords || (p as any).coords,
         };
       });
+    } else {
+      list = (initialPlotsRaw as any[]).map((p) => ({
+        ...p,
+        sizeSqYd: 200,
+        sizeSqFt: 1800,
+        lengthFt: 72,
+        widthFt: 25,
+      }));
     }
 
-    return (initialPlotsRaw as any[]).map((p) => ({
-      ...p,
-      sizeSqYd: 200,
-      sizeSqFt: 1800,
-      lengthFt: 72,
-      widthFt: 25,
-    }));
+    return sortByPlotNumber(list);
   }, [initialPropPlots]);
 
   const [plots, setPlots] = useState<PlotData[]>(mergedInitialPlots);
@@ -106,7 +118,7 @@ export default function PlotInventoryViewer({
   const [emiRate, setEmiRate] = useState<number>(8.5);
   const [emiTenureYears, setEmiTenureYears] = useState<number>(15);
 
-  // Sync with /api/plots if live updates arrive
+  // Sync with /api/plots if live updates arrive, maintaining 1 to 69 sort
   useEffect(() => {
     fetch('/api/plots?t=' + Date.now(), { cache: 'no-store' })
       .then((res) => res.json())
@@ -128,15 +140,15 @@ export default function PlotInventoryViewer({
               coords: raw?.coords || p.coords,
             };
           });
-          setPlots(merged);
+          setPlots(sortByPlotNumber(merged));
         }
       })
       .catch(() => {});
   }, []);
 
-  // Filtered plot set
+  // Filtered plot set sorted numerically 1 to 69
   const filteredPlots = useMemo(() => {
-    return plots.filter((plot) => {
+    const list = plots.filter((plot) => {
       if (searchTerm && !plot.plotNumber.toLowerCase().includes(searchTerm.toLowerCase().trim())) {
         return false;
       }
@@ -150,6 +162,7 @@ export default function PlotInventoryViewer({
       if (onlyParks && !plot.isParkFacing) return false;
       return true;
     });
+    return sortByPlotNumber(list);
   }, [plots, searchTerm, selectedStatus, selectedFacing, onlyCorners, onlyParks]);
 
   const filteredPlotNumbers = useMemo(() => {

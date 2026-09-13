@@ -13,9 +13,13 @@ export default async function PlotsInventoryPage() {
     where: { slug: 'riddhi' },
   });
 
-  const plots = await prisma.plot.findMany({
+  const rawPlots = await prisma.plot.findMany({
     where: { projectId: project?.id || '' },
-    orderBy: { plotNumber: 'asc' },
+  });
+  const plots = rawPlots.sort((a, b) => {
+    const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
   });
 
   return (

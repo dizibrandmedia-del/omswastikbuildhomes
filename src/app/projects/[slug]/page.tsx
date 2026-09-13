@@ -48,6 +48,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailProps) 
     notFound();
   }
 
+  // Ensure plots are sorted numerically 1 to 69
+  if (project.plots && Array.isArray(project.plots)) {
+    project.plots.sort((a, b) => {
+      const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+      const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+      return numA - numB;
+    });
+  }
+
   // Parse JSON data safely
   let highlights: string[] = [];
   try {

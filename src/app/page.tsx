@@ -50,10 +50,14 @@ export default async function HomePage() {
     where: { slug: 'riddhi' },
   });
 
-  // Fetch available plots
-  const plots = await prisma.plot.findMany({
+  // Fetch available plots sorted numerically 1 to 69
+  const rawPlots = await prisma.plot.findMany({
     where: { projectId: project?.id || '' },
-    orderBy: { plotNumber: 'asc' },
+  });
+  const plots = rawPlots.sort((a, b) => {
+    const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
   });
 
   // Fetch active videos for gallery

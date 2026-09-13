@@ -11,12 +11,17 @@ export async function GET(req: NextRequest) {
   if (projectId && projectId !== 'ALL') whereClause.projectId = projectId;
   if (status && status !== 'ALL') whereClause.status = status;
 
-  const plots = await prisma.plot.findMany({
+  const rawPlots = await prisma.plot.findMany({
     where: whereClause,
-    orderBy: { plotNumber: 'asc' },
     include: {
       project: { select: { id: true, name: true, location: true } },
     },
+  });
+
+  const plots = rawPlots.sort((a, b) => {
+    const numA = parseInt(String(a.plotNumber).replace(/\D/g, ''), 10) || 0;
+    const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
+    return numA - numB;
   });
 
   return NextResponse.json({ plots });
