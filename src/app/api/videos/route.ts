@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, hasPermission } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 function extractYoutubeId(url: string): string | null {
   if (!url) return null;
@@ -24,7 +28,10 @@ export async function GET(req: NextRequest) {
       ]
     });
 
-    return NextResponse.json({ videos });
+    return NextResponse.json(
+      { videos },
+      { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to fetch videos' }, { status: 500 });
   }
@@ -60,7 +67,20 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    return NextResponse.json({ success: true, video: newVideo }, { status: 201 });
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin/videos');
+    } catch (e) {
+      console.error('Revalidation error:', e);
+    }
+
+    return NextResponse.json(
+      { success: true, video: newVideo },
+      {
+        status: 201,
+        headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to create video' }, { status: 500 });
   }

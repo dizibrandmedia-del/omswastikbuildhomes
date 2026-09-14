@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, hasPermission } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 function extractYoutubeId(url: string): string | null {
   if (!url) return null;
@@ -51,7 +52,17 @@ export async function PUT(
       data: updatedData,
     });
 
-    return NextResponse.json({ success: true, video: updated });
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin/videos');
+    } catch (e) {
+      console.error('Revalidation error:', e);
+    }
+
+    return NextResponse.json(
+      { success: true, video: updated },
+      { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to update video' }, { status: 500 });
   }
@@ -71,8 +82,19 @@ export async function DELETE(
 
     await prisma.video.delete({ where: { id } });
 
-    return NextResponse.json({ success: true, message: 'Video deleted successfully' });
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin/videos');
+    } catch (e) {
+      console.error('Revalidation error:', e);
+    }
+
+    return NextResponse.json(
+      { success: true, message: 'Video deleted successfully' },
+      { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Failed to delete video' }, { status: 500 });
   }
 }
+

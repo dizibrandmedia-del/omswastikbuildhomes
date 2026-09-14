@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, hasPermission } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -53,5 +54,18 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     },
   });
 
-  return NextResponse.json({ success: true, plot: updated });
+  try {
+    revalidatePath('/');
+    revalidatePath('/plots');
+    revalidatePath('/admin/inventory');
+    revalidatePath(`/plots/${id}`);
+  } catch (e) {
+    console.error('Revalidation error:', e);
+  }
+
+  return NextResponse.json(
+    { success: true, plot: updated },
+    { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+  );
 }
+

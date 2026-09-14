@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -37,7 +38,7 @@ model Project {
   location         String
   city             String
   state            String    @default("Gujarat")
-  fullAddress      String?
+  fullAddress      String?   @db.Text
   description      String    @db.Text
   highlights       String?   @db.Text
   totalProjectArea String?
@@ -46,7 +47,7 @@ model Project {
   nearbyLandmarks  String?   @db.Text
   connectivity     String?   @db.Text
   googleMapUrl     String?   @db.Text
-  heroImage        String?
+  heroImage        String?   @db.Text
   videoUrl         String?   @db.Text
   brochureUrl      String?   @db.Text
   siteLayoutImage  String?   @db.Text
@@ -231,19 +232,38 @@ model BlogPost {
   id             String    @id @default(cuid())
   title          String
   slug           String    @unique
-  featuredImage  String?
+  featuredImage  String?   @db.Text
   excerpt        String    @db.Text
   content        String    @db.LongText
   author         String    @default("Om Swastik Research Team")
+  category       String    @default("Investment Insights")
+  readTime       String?   @default("5 min read")
   publishedAt    DateTime?
-  status         String    @default("DRAFT")
+  status         String    @default("PUBLISHED")
   seoTitle       String?
-  seoDescription String?
+  seoDescription String?   @db.Text
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   @@index([status])
   @@index([slug])
+}
+
+model Video {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?   @db.Text
+  videoUrl     String    @db.Text
+  youtubeId    String?
+  thumbnailUrl String?   @db.Text
+  category     String    @default("Site Tour")
+  displayOrder Int       @default(0)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([isActive])
+  @@index([displayOrder])
 }
 
 model Testimonial {
@@ -252,7 +272,7 @@ model Testimonial {
   designation  String?
   review       String    @db.Text
   rating       Int       @default(5)
-  avatarImage  String?
+  avatarImage  String?   @db.Text
   project      String?
   displayOrder Int       @default(0)
   isActive     Boolean   @default(true)
@@ -315,11 +335,11 @@ model ContactSetting {
   altEmail          String?  @default("rahulbisht0802@gmail.com")
   whatsappNumber    String   @default("919599213531")
   googleMapEmbed    String?  @db.Text
-  facebookUrl       String?
-  instagramUrl      String?
-  linkedinUrl       String?
-  youtubeUrl        String?
-  twitterUrl        String?
+  facebookUrl       String?  @db.Text
+  instagramUrl      String?  @db.Text
+  linkedinUrl       String?  @db.Text
+  youtubeUrl        String?  @db.Text
+  twitterUrl        String?  @db.Text
   updatedAt         DateTime @updatedAt
 }
 

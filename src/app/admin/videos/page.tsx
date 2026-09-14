@@ -101,10 +101,10 @@ export default function AdminVideosPage() {
 
   const fetchVideos = async () => {
     try {
-      const res = await fetch('/api/videos?all=true');
+      const res = await fetch(`/api/videos?all=true&t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        if (data.videos && Array.isArray(data.videos) && data.videos.length > 0) {
+        if (data.videos && Array.isArray(data.videos)) {
           setVideos(data.videos);
         }
       }

@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSessionUser, hasPermission } from '@/lib/auth';
-
+import { revalidatePath } from 'next/cache';
 import initialPlotsRaw from '@/lib/initialPlots.json';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,7 +30,10 @@ export async function GET(req: NextRequest) {
       return numA - numB;
     });
 
-    return NextResponse.json({ plots });
+    return NextResponse.json(
+      { plots },
+      { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+    );
   } catch (err: any) {
     console.warn('/api/plots DB error, returning fallback initialPlots:', err);
     const plots = (initialPlotsRaw as any[]).sort((a, b) => {
@@ -35,7 +41,10 @@ export async function GET(req: NextRequest) {
       const numB = parseInt(String(b.plotNumber).replace(/\D/g, ''), 10) || 0;
       return numA - numB;
     });
-    return NextResponse.json({ plots, fallback: true });
+    return NextResponse.json(
+      { plots, fallback: true },
+      { headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' } }
+    );
   }
 }
 
@@ -117,7 +126,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, plot }, { status: 201 });
+    try {
+      revalidatePath('/');
+      revalidatePath('/plots');
+      revalidatePath('/admin/inventory');
+    } catch (e) {
+      console.error('Revalidation error:', e);
+    }
+
+    return NextResponse.json(
+      { success: true, plot },
+      {
+        status: 201,
+        headers: { 'Cache-Control': 'no-store, max-age=0, must-revalidate' },
+      }
+    );
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

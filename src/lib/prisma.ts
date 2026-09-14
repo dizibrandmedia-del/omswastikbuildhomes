@@ -1,50 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-import path from 'path';
-import fs from 'fs';
 
-// Helper to determine accurate and writable SQLite database path
+const DEFAULT_DATABASE_URL =
+  'mysql://u468161300_omswastik:OmSwastik%232026%21ProdDb@srv2204.hstgr.io:3306/u468161300_omswastik';
+
 function getDatabaseUrl(): string {
-  if (process.env.DATABASE_URL && !process.env.DATABASE_URL.startsWith('file:')) {
+  if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('mysql://')) {
     return process.env.DATABASE_URL;
   }
-
-  // On Vercel serverless runtime, /var/task is read-only.
-  // We copy dev.db to /tmp/dev.db where SQLite can open, lock and write.
-  if (process.env.VERCEL) {
-    const tmpDbPath = path.join('/tmp', 'dev.db');
-    if (!fs.existsSync(tmpDbPath)) {
-      const candidates = [
-        path.join(process.cwd(), 'prisma', 'dev.db'),
-        path.join(process.cwd(), 'dev.db'),
-      ];
-      for (const src of candidates) {
-        if (fs.existsSync(src)) {
-          try {
-            fs.copyFileSync(src, tmpDbPath);
-            break;
-          } catch (e) {
-            console.error('Error copying db to /tmp on Vercel:', e);
-          }
-        }
-      }
-    }
-    if (fs.existsSync(tmpDbPath)) {
-      return 'file:' + tmpDbPath;
-    }
-  }
-
-  // If running locally or on regular server
-  const candidates = [
-    path.join(process.cwd(), 'prisma', 'dev.db'),
-    path.join(process.cwd(), 'dev.db'),
-  ];
-  for (const src of candidates) {
-    if (fs.existsSync(src)) {
-      return 'file:' + src.replace(/\\/g, '/');
-    }
-  }
-
-  return process.env.DATABASE_URL || 'file:./prisma/dev.db';
+  return DEFAULT_DATABASE_URL;
 }
 
 const globalForPrisma = globalThis as unknown as {
